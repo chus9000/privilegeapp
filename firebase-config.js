@@ -1,17 +1,20 @@
 // Firebase Configuration - v4.0 - Authentication + Realtime Database
+// SECURITY NOTE: These values will be public in your deployed app.
+// Security is enforced through Firebase Security Rules, not by hiding these values.
+// However, you should still restrict your API key in Firebase Console to prevent abuse.
 const FIREBASE_CONFIG = {
-    apiKey: "AIzaSyAKL_N02AlAET1Ly_2CrOSBZSPKo4ld90g", // Replace with your actual API key
-    authDomain: "privilegeapp-104dd.firebaseapp.com",
-    databaseURL: "https://privilegeapp-104dd-default-rtdb.europe-west1.firebasedatabase.app",
-    projectId: "privilegeapp-104dd",
-    storageBucket: "privilegeapp-104dd.firebasestorage.app",
-    messagingSenderId: "851081851629",
-    appId: "1:851081851629:web:229b75a75d2bd0a96e12e4",
-    measurementId: "G-T7V9PWJ2VP"
+    apiKey: "YOUR_API_KEY_HERE", // Replace with your actual API key
+    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+    databaseURL: "https://YOUR_PROJECT_ID-default-rtdb.REGION.firebasedatabase.app",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT_ID.firebasestorage.app",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID",
+    measurementId: "YOUR_MEASUREMENT_ID"
 };
 
-const FIREBASE_PROJECT_ID = 'privilegeapp-104dd';
-const FIREBASE_RTDB_URL = `https://${FIREBASE_PROJECT_ID}-default-rtdb.europe-west1.firebasedatabase.app/`;
+const FIREBASE_PROJECT_ID = FIREBASE_CONFIG.projectId;
+const FIREBASE_RTDB_URL = FIREBASE_CONFIG.databaseURL.endsWith('/') ? FIREBASE_CONFIG.databaseURL : `${FIREBASE_CONFIG.databaseURL}/`;
 
 console.log('🔥🔥🔥 Firebase Config v4.0 loaded - Authentication + Realtime Database 🔥🔥🔥');
 console.log('🚀 RTDB URL:', FIREBASE_RTDB_URL);
