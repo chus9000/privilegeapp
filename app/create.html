@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Event - Privilege Spectrum</title>
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="icon" type="image/x-icon" href="../favicon.ico">
+</head>
+<body>
+    <!-- Logo Header -->
+    <div class="logo-header">
+        <a href="/app" class="logo-small">
+            <div class="logo-small-line-1">THE</div>
+            <div class="logo-small-line-2">PRIVILEGE</div>
+            <div class="logo-small-line-3">SPECTRUM</div>
+        </a>
+    </div>
+
+    <div class="container">
+        <!-- Create Event Form -->
+        <div id="createForm" class="create-form">
+            <h1>Create New Event</h1>
+            <p class="form-description">Customize your event by giving it a title and selecting which questions to include.</p>
+            
+            <form id="eventCreationForm">
+                <!-- Event Title Input -->
+                <div class="form-group">
+                    <label for="eventTitle">Event Title <span class="required">*</span></label>
+                    <input 
+                        type="text" 
+                        id="eventTitle" 
+                        name="eventTitle"
+                        placeholder="Enter event title (e.g., Team Building Workshop)"
+                        maxlength="100"
+                        required
+                    >
+                    <div class="char-counter">
+                        <span id="charCount">0</span>/100 characters
+                    </div>
+                    <div id="titleError" class="error-message" style="display: none;"></div>
+                </div>
+
+                <!-- Question Selection -->
+                <div class="form-group">
+                    <label>Questions</label>
+                    <p class="field-description">Select which questions to include in your event (minimum 5 required)</p>
+                    <button type="button" id="reviewQuestionsBtn" class="secondary-btn">
+                        Review & Select Questions <span id="questionCount">(35)</span>
+                    </button>
+                    <div id="questionsError" class="error-message" style="display: none;"></div>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="form-actions">
+                    <button type="button" id="cancelBtn" class="secondary-btn">Cancel</button>
+                    <button type="submit" id="createEventBtn" class="primary-btn">Create Event</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Event Created Success View -->
+        <div id="eventCreated" class="event-created" style="display: none;">
+            <div class="success-icon">✅</div>
+            <h1>Event Created Successfully!</h1>
+            <p class="success-description">Share the link and PIN with your participants to get started.</p>
+            
+            <div class="event-details">
+                <div class="detail-group">
+                    <label>Event Link</label>
+                    <div class="input-with-button">
+                        <input type="text" id="eventUrl" readonly>
+                        <button id="copyUrlBtn" class="copy-btn" title="Copy link">📋</button>
+                    </div>
+                </div>
+                
+                <div class="detail-group">
+                    <label>Event PIN</label>
+                    <div class="input-with-button">
+                        <input type="text" id="eventPin" readonly>
+                        <button id="copyPinBtn" class="copy-btn" title="Copy PIN">📋</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="success-actions">
+                <button id="goToDashboardBtn" class="primary-btn">Go to Dashboard</button>
+                <button id="createAnotherBtn" class="secondary-btn">Create Another Event</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Questions Selection Modal -->
+    <div id="questionsModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Select Questions</h2>
+                <button id="closeModalBtn" class="close-btn">&times;</button>
+            </div>
+            
+            <div class="modal-body">
+                <div class="modal-info">
+                    <p>Choose which questions to include in your event. At least 5 questions must be enabled.</p>
+                    <div class="question-counter">
+                        <span id="enabledQuestionsCounter">35 questions enabled</span>
+                    </div>
+                </div>
+                
+                <div id="questionsList" class="questions-list">
+                    <!-- Questions will be dynamically rendered here -->
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button id="cancelQuestionsBtn" class="secondary-btn">Cancel</button>
+                <button id="saveQuestionsBtn" class="primary-btn">Save Selection</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <div class="footer-content">
+            <div>© 2024 The Privilege Spectrum. All rights reserved.</div>
+            <div>
+                <a href="/privacy.html">Privacy Policy</a> | 
+                <a href="/terms.html">Terms of Service</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../questions.js"></script>
+    <script src="../auth-manager.js"></script>
+    <script src="../firebase-config.js"></script>
+    <script src="event-creation.js"></script>
+</body>
+</html>

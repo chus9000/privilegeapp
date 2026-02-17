@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privilege Spectrum - Understand Your Privilege</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="./favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="./favicon-16x16.png">
+    <link rel="manifest" href="./site.webmanifest">
+</head>
+<body class="landing-body">
+    <div class="landing-hero">
+        <div class="hero-content">
+            <h1 class="hero-title">Privilege Spectrum</h1>
+            <p class="hero-subtitle">Understand your privilege. Build awareness. Take action.</p>
+            
+            <div class="hero-actions">
+                <button id="freePlayBtn" class="btn-primary">
+                    <span class="btn-text">Start Free Play</span>
+                    <span class="btn-subtext">Anonymous • Compare with others</span>
+                </button>
+                <button id="createEventBtn" class="btn-secondary">
+                    <span class="btn-text">Create Your Event</span>
+                    <span class="btn-subtext">Customize • Share with your group</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <main class="landing-main">
+        <section class="section-intro">
+            <div class="content-wrapper">
+                <h2 class="section-title">What is Privilege Spectrum?</h2>
+                <p class="section-lead">
+                    An interactive tool that helps you explore the various forms of privilege that shape our experiences. 
+                    Through thoughtful questions, you'll gain insight into how different aspects of identity and circumstance 
+                    create advantages or challenges in our society.
+                </p>
+            </div>
+        </section>
+
+        <section class="section-how">
+            <div class="content-wrapper">
+                <h2 class="section-title">How It Works</h2>
+                <div class="steps-container">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <h3>Answer Questions</h3>
+                        <p>Respond to a series of questions about your life experiences. Each question explores different aspects of privilege in society.</p>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <h3>See Your Results</h3>
+                        <p>Your responses are calculated to show where you fall on the privilege spectrum, revealing patterns of advantage and disadvantage.</p>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <h3>Take Action</h3>
+                        <p>Receive personalized guidance on using your awareness constructively—whether amplifying voices, advocating for change, or building supportive communities.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section-why">
+            <div class="content-wrapper">
+                <h2 class="section-title">Why It Matters</h2>
+                <p class="section-lead">
+                    Understanding privilege isn't about guilt—it's about awareness. Recognizing our advantages and challenges 
+                    helps us become better allies, make informed decisions, and work toward equity. When we understand how 
+                    systems of privilege operate, we can actively contribute to creating a more just and inclusive society.
+                </p>
+            </div>
+        </section>
+
+        <section class="section-impact">
+            <div class="content-wrapper">
+                <div class="impact-badge">Real Impact</div>
+                <h2 class="impact-title">Used by 255 Amazonians in November 2024</h2>
+                <p class="impact-description">
+                    Featured at an Amazon diversity event where participants explored privilege awareness in a safe, 
+                    interactive environment. The experience sparked meaningful conversations and helped build a more 
+                    inclusive workplace culture.
+                </p>
+                <a href="https://medium.com/@jesusmartin/beyond-the-comfort-zone-what-255-amazonians-learned-about-privilege-3a05e350a89c" 
+                   target="_blank" 
+                   class="impact-link">
+                    Read the full story
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M6 3L11 8L6 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </a>
+            </div>
+        </section>
+
+        <section class="section-creator">
+            <div class="content-wrapper">
+                <div class="creator-card">
+                    <div class="creator-text">
+                        <h3>Created by Jesús Martín</h3>
+                        <p>Product Designer passionate about using technology to foster diversity, equity, and inclusion.</p>
+                        <div class="creator-links">
+                            <a href="https://www.linkedin.com/in/jesusmartinjimenez/" target="_blank">LinkedIn</a>
+                            <span class="link-separator">•</span>
+                            <a href="https://jesusmartin.eu" target="_blank">jesusmartin.eu</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section-attribution">
+            <div class="content-wrapper">
+                <p class="attribution-text">
+                    This project was inspired by the privilege spectrum experiment from 
+                    <a href="https://www.youtube.com/watch?v=hD5f8GuNuGQ" target="_blank">this video</a> 
+                    by <a href="http://buzzfeed.com/asis" target="_blank">As/Is (BuzzFeed)</a>
+                </p>
+            </div>
+        </section>
+    </main>
+
+    <footer class="landing-footer">
+        <div class="footer-wrapper">
+            <div class="footer-main">
+                <span>Made with love © 2025 <a href="https://jesusmartin.eu" target="_blank">jesusmartin.eu</a></span>
+            </div>
+            <div class="footer-links">
+                <a href="mailto:hi@jesusmartin.eu">Contact</a>
+                <a href="privacy.html">Privacy</a>
+                <a href="terms.html">Terms</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="firebase-config.js"></script>
+    <script src="auth-manager.js"></script>
+    <script src="landing.js"></script>
+</body>
+</html>
