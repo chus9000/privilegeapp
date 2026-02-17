@@ -42,7 +42,7 @@ Your `firebase-config.js` currently has placeholder values. You need to:
 
 **Current placeholder values to replace:**
 ```javascript
-apiKey: "AIzaSyBqVZ8KqZ8KqZ8KqZ8KqZ8KqZ8KqZ8KqZ8"  // Replace this
+apiKey: ""  // Replace this
 authDomain: "privilegespectrum.firebaseapp.com"
 databaseURL: "https://privilegespectrum-default-rtdb.europe-west1.firebasedatabase.app"
 projectId: "privilegespectrum"
