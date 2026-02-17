@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Dashboard - Privilege Spectrum</title>
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="icon" type="image/x-icon" href="../favicon.ico">
+</head>
+<body>
+    <!-- Logo Header -->
+    <div class="logo-header">
+        <a href="/" class="logo-small">
+            <div class="logo-small-line-1">THE</div>
+            <div class="logo-small-line-2">PRIVILEGE</div>
+            <div class="logo-small-line-3">SPECTRUM</div>
+        </a>
+    </div>
+
+    <div class="container">
+        <!-- Dashboard Header -->
+        <div class="dashboard-header">
+            <h1>My Events</h1>
+            <div class="dashboard-actions">
+                <button id="createNewEventBtn" class="primary-btn">Create New Event</button>
+                <button id="signOutBtn" class="secondary-btn">Sign Out</button>
+            </div>
+        </div>
+
+        <!-- Events List Container -->
+        <div id="eventsContainer" class="events-container">
+            <!-- Events will be dynamically rendered here -->
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="empty-state" style="display: none;">
+            <div class="empty-state-icon">📋</div>
+            <h2>No Events Yet</h2>
+            <p>Create your first event to get started!</p>
+            <button id="createFirstEventBtn" class="primary-btn">Create Your First Event</button>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loadingState" class="loading-state">
+            <div class="loading-spinner"></div>
+            <p>Loading your events...</p>
+        </div>
+    </div>
+
+    <!-- Event Details Modal -->
+    <div id="eventDetailsModal" class="modal" style="display: none;">
+        <div class="modal-content event-details-modal">
+            <div class="modal-header">
+                <h2 id="eventDetailsTitle">Event Details</h2>
+                <button class="close-btn" onclick="closeEventDetailsModal()">&times;</button>
+            </div>
+            
+            <div class="modal-body">
+                <!-- Event Info Section -->
+                <div class="event-details-section">
+                    <h3>Event Information</h3>
+                    <div class="event-info-grid">
+                        <div class="info-item">
+                            <span class="info-label">Event Title:</span>
+                            <span id="detailsEventTitle" class="info-value"></span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">PIN:</span>
+                            <span id="detailsEventPin" class="info-value"></span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Created:</span>
+                            <span id="detailsEventDate" class="info-value"></span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Participants:</span>
+                            <span id="detailsParticipantCount" class="info-value"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Score Statistics Section -->
+                <div class="event-details-section">
+                    <h3>Score Statistics</h3>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-label">Mean Score</div>
+                            <div id="detailsMeanScore" class="stat-value">-</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Median Score</div>
+                            <div id="detailsMedianScore" class="stat-value">-</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Mode Score</div>
+                            <div id="detailsModeScore" class="stat-value">-</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Score Range</div>
+                            <div id="detailsScoreRange" class="stat-value">-</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Participants List Section -->
+                <div class="event-details-section">
+                    <h3>Participants</h3>
+                    <div id="detailsParticipantsList" class="participants-list">
+                        <!-- Participants will be rendered here -->
+                    </div>
+                    <div id="detailsNoParticipants" class="no-participants" style="display: none;">
+                        <p>No participants yet. Share the event link to get started!</p>
+                    </div>
+                </div>
+
+                <!-- Actions Section -->
+                <div class="event-details-actions">
+                    <button id="viewSpectrumBtn" class="primary-btn">View Spectrum</button>
+                    <button onclick="closeEventDetailsModal()" class="secondary-btn">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <div class="footer-content">
+            <div>© 2024 The Privilege Spectrum. All rights reserved.</div>
+            <div>
+                <a href="/privacy.html">Privacy Policy</a> | 
+                <a href="/terms.html">Terms of Service</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../auth-manager.js"></script>
+    <script src="../firebase-config.js" type="module"></script>
+    <script src="dashboard.js" type="module"></script>
+</body>
+</html>

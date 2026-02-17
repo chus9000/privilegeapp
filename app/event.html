@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redirecting...</title>
+    <script>
+        // Backward Compatibility: Redirect old event.html URLs to questions.html
+        // Requirement 13.1: Detect event.html in URL and redirect to questions.html with same parameters
+        (function() {
+            const currentPath = window.location.pathname;
+            const searchParams = window.location.search;
+            const hash = window.location.hash;
+            
+            // Replace event.html with questions.html
+            const newPath = currentPath.replace('event.html', 'questions.html');
+            const newUrl = newPath + searchParams + hash;
+            
+            console.log('🔄 Redirecting from old event.html to questions.html');
+            console.log('Old URL:', currentPath + searchParams + hash);
+            console.log('New URL:', newUrl);
+            
+            // Use replace to avoid adding to browser history
+            window.location.replace(newUrl);
+        })();
+    </script>
+</head>
+<body>
+    <p>Redirecting to the new URL...</p>
+</body>
+</html>

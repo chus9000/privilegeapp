@@ -1,0 +1,87 @@
+{
+  "rules": {
+    "events": {
+      "$eventId": {
+        ".read": true,
+        ".write": "auth != null || $eventId === 'freeplay'",
+        
+        "title": {
+          ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 100"
+        },
+        
+        "pin": {
+          ".validate": "newData.isString() && newData.val().matches(/^[0-9]{6}$/)"
+        },
+        
+        "creatorId": {
+          ".validate": "newData.isString()",
+          ".write": "!data.exists() && auth != null && newData.val() === auth.uid"
+        },
+        
+        "createdAt": {
+          ".validate": "newData.isString()"
+        },
+        
+        "disabledQuestions": {
+          ".validate": "!newData.exists() || newData.hasChildren()"
+        },
+        
+        "participants": {
+          ".read": true,
+          ".write": true,
+          
+          "$participantId": {
+            ".validate": "newData.hasChildren(['id', 'score', 'answers', 'createdAt'])",
+            
+            "id": {
+              ".validate": "newData.isString()"
+            },
+            
+            "name": {
+              ".validate": "newData.isString() || !newData.exists()"
+            },
+            
+            "avatar": {
+              ".validate": "newData.isString() || !newData.exists()"
+            },
+            
+            "score": {
+              ".validate": "newData.isNumber()"
+            },
+            
+            "answers": {
+              ".validate": "newData.hasChildren()"
+            },
+            
+            "createdAt": {
+              ".validate": "newData.isString()"
+            }
+          }
+        }
+      }
+    },
+    
+    "users": {
+      "$userId": {
+        ".read": "auth != null && auth.uid === $userId",
+        ".write": "auth != null && auth.uid === $userId",
+        
+        "email": {
+          ".validate": "newData.isString()"
+        },
+        
+        "displayName": {
+          ".validate": "newData.isString() || !newData.exists()"
+        },
+        
+        "photoURL": {
+          ".validate": "newData.isString() || !newData.exists()"
+        },
+        
+        "createdAt": {
+          ".validate": "newData.isString()"
+        }
+      }
+    }
+  }
+}
