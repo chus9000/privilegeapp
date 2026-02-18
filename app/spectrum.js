@@ -905,7 +905,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const backToResultsBtn = document.getElementById('backToResultsBtn');
     if (backToResultsBtn) {
         backToResultsBtn.addEventListener('click', () => {
-            window.location.href = `/app/results.html?id=${eventId}`;
+            window.location.href = `./results.html?id=${eventId}`;
         });
     }
     

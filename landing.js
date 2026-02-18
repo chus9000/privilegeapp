@@ -40,7 +40,7 @@ function setupEventListeners() {
  */
 function onFreePlayClick() {
     console.log('🎯 Free Play mode selected');
-    window.location.href = '/app/questions.html?id=freeplay';
+    window.location.href = './app/questions.html?id=freeplay';
 }
 
 /**
@@ -64,7 +64,7 @@ async function onCreateEventClick() {
         if (user) {
             console.log('✅ Authentication successful, navigating to dashboard');
             // Navigate to event dashboard
-            window.location.href = '/app';
+            window.location.href = './app/';
         } else {
             console.log('⚠️ Authentication cancelled by user');
             // Restore button state
@@ -102,7 +102,7 @@ function checkAuthSession() {
                 <span class="btn-subtext">Manage your events</span>
             `;
             createEventBtn.onclick = () => {
-                window.location.href = '/app';
+                window.location.href = './app/';
             };
         }
     }

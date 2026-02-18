@@ -627,7 +627,7 @@ function setupBackButton() {
     const backButton = document.getElementById('backToResults');
     if (backButton) {
         backButton.addEventListener('click', () => {
-            window.location.href = `/app/results.html?id=${eventId}`;
+            window.location.href = `./results.html?id=${eventId}`;
         });
     }
     

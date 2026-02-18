@@ -518,7 +518,7 @@ This implementation plan transforms the MVP Privilege Spectrum application into 
 - [x] 21. Final checkpoint - Ensure everything works
   - Ensure all tests pass, ask the user if questions arise.
 
-- [~] 22. Documentation and deployment
+- [ ] 22. Documentation and deployment
   - Update README with new features and setup instructions
   - Document environment variables needed
   - Document Firebase setup steps

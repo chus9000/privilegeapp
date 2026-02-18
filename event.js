@@ -97,7 +97,7 @@ function showEventError(message) {
             <div class="card">
                 <h1>⚠️ Error</h1>
                 <p>${message}</p>
-                <button onclick="window.location.href='/'">Return to Home</button>
+                <button onclick="window.location.href='../'">Return to Home</button>
             </div>
         </div>
     `;
@@ -317,7 +317,9 @@ async function loadEvent() {
     const enabledCount = questions.length - disabledQuestions.length;
     document.getElementById('progressText').textContent = `0/${enabledCount} completed`;
     
-    document.getElementById('resultsLink').href = `/app/results.html?id=${eventId}`;
+    // Build results link with relative path
+    const basePath = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/'));
+    document.getElementById('resultsLink').href = `./results.html?id=${eventId}`;
     
     // Restore answers after questions are rendered
     restoreAnswers();

@@ -948,7 +948,7 @@ function viewSpectrum() {
     }
     
     // Navigate to spectrum page
-    window.location.href = `/app/spectrum.html?id=${eventId}`;
+    window.location.href = `./spectrum.html?id=${eventId}`;
 }
 
 // Function to automatically show current participant's modal
