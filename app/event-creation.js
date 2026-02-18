@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Check authentication - redirect if not authenticated
         if (!window.AuthManager.isAuthenticated()) {
             console.log('⚠️ User not authenticated, redirecting to landing page');
-            window.location.href = '/';
+            window.location.href = '../';
             return;
         }
         
@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.log('✅ User authenticated:', currentUser.email);
     } else {
         console.error('❌ AuthManager not available');
-        window.location.href = '/';
+        window.location.href = '../';
         return;
     }
     
@@ -87,7 +87,7 @@ function setupEventListeners() {
     const cancelBtn = document.getElementById('cancelBtn');
     if (cancelBtn) {
         cancelBtn.addEventListener('click', () => {
-            window.location.href = '/app';
+            window.location.href = './';
         });
     }
     
@@ -111,7 +111,7 @@ function setupEventListeners() {
     const goToDashboardBtn = document.getElementById('goToDashboardBtn');
     if (goToDashboardBtn) {
         goToDashboardBtn.addEventListener('click', () => {
-            window.location.href = '/app';
+            window.location.href = './';
         });
     }
     
@@ -394,7 +394,8 @@ async function handleFormSubmit(e) {
         console.log('✅ Event created successfully');
         
         // Store event details for display
-        createdEventUrl = `${window.location.origin}/questions.html?id=${eventId}`;
+        const basePath = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/'));
+        createdEventUrl = `${window.location.origin}${basePath}/questions.html?id=${eventId}`;
         createdEventPin = pin;
         
         // Show success view

@@ -120,11 +120,14 @@ class RouteGuard {
     redirectToLanding() {
         // Store the intended destination for post-login redirect (optional)
         const intendedPath = window.location.pathname + window.location.search;
-        if (intendedPath !== '/') {
+        const basePath = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/'));
+        const rootPath = basePath.replace(/\/app.*$/, '/');
+        
+        if (intendedPath !== rootPath) {
             sessionStorage.setItem('intended_path', intendedPath);
         }
         
-        window.location.href = '/';
+        window.location.href = rootPath || '../';
     }
 
     /**

@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Check authentication
         if (!window.AuthManager.isAuthenticated()) {
             console.log('⚠️ User not authenticated, redirecting to landing page');
-            window.location.href = '/';
+            window.location.href = '../';
             return;
         }
         
@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         await loadEvents();
     } else {
         console.error('❌ AuthManager not available');
-        window.location.href = '/';
+        window.location.href = '../';
     }
     
     // Set up event listeners
@@ -158,8 +158,9 @@ function createEventCard(event) {
     // Get participant count
     const participantCount = event.participants ? event.participants.length : 0;
     
-    // Build event URL
-    const eventUrl = `${window.location.origin}/app/questions.html?id=${event.id}`;
+    // Build event URL - use relative path from current location
+    const basePath = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/'));
+    const eventUrl = `${window.location.origin}${basePath}/questions.html?id=${event.id}`;
     
     card.innerHTML = `
         <div class="event-card-header">
@@ -247,7 +248,7 @@ function copyEventLink(url) {
  */
 function navigateToCreate() {
     console.log('➕ Navigating to event creation');
-    window.location.href = '/app/create';
+    window.location.href = './create.html';
 }
 
 /**
@@ -305,7 +306,7 @@ async function handleSignOut() {
     try {
         await window.AuthManager.signOut();
         console.log('✅ Sign out successful');
-        window.location.href = '/';
+        window.location.href = '../';
     } catch (error) {
         // Requirements: 15.1, 15.5 - Log auth errors with context and show user-friendly message
         console.error('❌ Authentication operation failed: signOut', {
@@ -513,7 +514,7 @@ function showEventDetailsModal(event) {
     // Set up view spectrum button
     const viewSpectrumBtn = document.getElementById('viewSpectrumBtn');
     viewSpectrumBtn.onclick = () => {
-        window.location.href = `/app/spectrum.html?id=${event.id}`;
+        window.location.href = `./spectrum.html?id=${event.id}`;
     };
     
     // Set up real-time updates for analytics

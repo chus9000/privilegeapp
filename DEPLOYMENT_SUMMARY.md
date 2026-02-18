@@ -42,13 +42,13 @@ Your `firebase-config.js` currently has placeholder values. You need to:
 
 **Current placeholder values to replace:**
 ```javascript
-apiKey: ""  // Replace this
-authDomain: "privilegespectrum.firebaseapp.com"
-databaseURL: "https://privilegespectrum-default-rtdb.europe-west1.firebasedatabase.app"
-projectId: "privilegespectrum"
-storageBucket: "privilegespectrum.appspot.com"
-messagingSenderId: "123456789012"  // Replace this
-appId: "1:123456789012:web:abcdef1234567890abcdef"  // Replace this
+apiKey: "YOUR_API_KEY_HERE"
+authDomain: "YOUR_PROJECT_ID.firebaseapp.com"
+databaseURL: "https://YOUR_PROJECT_ID-default-rtdb.REGION.firebasedatabase.app"
+projectId: "YOUR_PROJECT_ID"
+storageBucket: "YOUR_PROJECT_ID.firebasestorage.app"
+messagingSenderId: "YOUR_SENDER_ID"
+appId: "YOUR_APP_ID"
 ```
 
 #### 2. Set Up Firebase (Required)
