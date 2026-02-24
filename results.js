@@ -3,6 +3,18 @@ const eventId = urlParams.get('id');
 const isFreePlayMode = eventId === 'freeplay';
 let eventData;
 
+/**
+ * Format a score with appropriate sign prefix
+ * Requirements: 1.2, 1.3, 1.4
+ * @param {number} score - The score to format
+ * @returns {string} "+N" for positive, "-N" for negative, "0" for zero
+ */
+function formatScore(score) {
+    if (score > 0) return `+${score}`;
+    if (score < 0) return `${score}`;
+    return '0';
+}
+
 // Hide spectrum immediately for free play mode (before page renders)
 if (isFreePlayMode) {
     // Add CSS to hide spectrum container immediately
@@ -617,6 +629,12 @@ function loadResults() {
     
     document.getElementById('eventTitle').textContent = eventData.title + ' - Results';
 
+    // Set up "View Detailed Results" button with event ID
+    const viewDetailedBtn = document.getElementById('viewDetailedBtn');
+    if (viewDetailedBtn) {
+        viewDetailedBtn.href = `detailed-results.html?id=${eventId}`;
+    }
+
     // Show "View Spectrum" button for event mode
     const viewSpectrumBtn = document.getElementById('viewSpectrumBtn');
     if (viewSpectrumBtn) {
@@ -679,7 +697,7 @@ function renderParticipants() {
         participantDiv.innerHTML = `
             <div class="participant-container" style="left: ${data.position}%" onclick="showParticipantModal('${participant.id}')">
                 <div class="participant-avatar">${participant.avatar}</div>
-                <div class="participant-name-label">${participant.name} (${participant.score > 0 ? '+' : ''}${participant.score})</div>
+                <div class="participant-name-label">${participant.name} (${formatScore(participant.score)})</div>
             </div>
         `;
         
@@ -841,92 +859,81 @@ function updateSearchCount(visibleCount = null, totalCount = null) {
 }
 
 // Modal functionality
-function showParticipantModal(participantId) {
+async function showParticipantModal(participantId) {
     const participant = allParticipants.find(p => p.id === participantId);
     if (!participant) return;
-    
-    // Calculate statistics
-    const stats = calculateParticipantStats(participant);
-    
+
     // Populate modal content
     document.getElementById('modalAvatar').textContent = participant.avatar;
     document.getElementById('modalName').textContent = participant.name;
-    document.getElementById('modalScore').textContent = `Score: ${participant.score > 0 ? '+' : ''}${participant.score}`;
-    
-    // Populate statistics
-    document.getElementById('privilegeComparison').textContent = stats.privilegeComparison;
-    document.getElementById('privilegeComparison').className = `stat-value ${stats.privilegeClass}`;
-    
-    document.getElementById('modeComparison').textContent = stats.modeComparison;
-    document.getElementById('modeComparison').className = `stat-value ${stats.modeClass}`;
-    
-    document.getElementById('medianComparison').textContent = stats.medianComparison;
-    document.getElementById('medianComparison').className = `stat-value ${stats.medianClass}`;
-    
-    // Add ally tips based on participant's score
+
+    // Render only stat cards (not full debrief)
+    // Requirements: 3.1, 3.2, 3.3
     const { min, max } = spectrumConfig;
-    const allyTipsArray = getTipsForScore(participant.score, min, max);
-    const category = categorizeScore(participant.score, min, max);
-    const allyTipsHTML = renderTips(allyTipsArray, category);
-    
-    const modalAllyTips = document.getElementById('modalAllyTips');
-    if (modalAllyTips) {
-        modalAllyTips.innerHTML = allyTipsHTML;
+    const modalDebrief = document.getElementById('modalDebrief');
+    if (modalDebrief) {
+        try {
+            const { renderStatCards } = await import('../debrief-renderer.js');
+
+            // Calculate analytics data for stat cards
+            const scores = allParticipants.map(p => p.score);
+            const sortedScores = [...scores].sort((a, b) => a - b);
+            const median = sortedScores.length % 2 === 0
+                ? (sortedScores[sortedScores.length / 2 - 1] + sortedScores[sortedScores.length / 2]) / 2
+                : sortedScores[Math.floor(sortedScores.length / 2)];
+            const mean = Math.round(scores.reduce((sum, s) => sum + s, 0) / scores.length);
+
+            // Calculate mode (most frequent score)
+            const scoreFrequency = {};
+            scores.forEach(score => {
+                scoreFrequency[score] = (scoreFrequency[score] || 0) + 1;
+            });
+            const maxFrequency = Math.max(...Object.values(scoreFrequency));
+            const modes = Object.keys(scoreFrequency).filter(score => scoreFrequency[score] === maxFrequency).map(Number);
+            const mode = modes.length === 1 ? modes[0] : modes[0]; // Use first mode if multiple
+
+            const lessPrivilegedCount = scores.filter(score => score < participant.score).length;
+            const percentile = Math.round((lessPrivilegedCount / scores.length) * 100);
+
+            // Render only stat cards (no score meaning or response analysis)
+            const statCardsHTML = renderStatCards(
+                participant.score,
+                { mean, median, mode },
+                percentile,
+                allParticipants.length,
+                lessPrivilegedCount
+            );
+
+            modalDebrief.innerHTML = statCardsHTML;
+            
+            // Check if this is the session participant
+            // Requirements: 3.4, 3.5
+            const sessionParticipantId = sessionStorage.getItem(`participant_${eventId}`);
+            
+            // Add "View My Full Results" button if viewing own avatar
+            if (participantId === sessionParticipantId) {
+                const backToScoreBtn = document.createElement('button');
+                backToScoreBtn.className = 'btn btn-primary';
+                backToScoreBtn.textContent = 'View My Full Results';
+                backToScoreBtn.onclick = () => {
+                    window.location.href = `./score.html?id=${eventId}`;
+                };
+                modalDebrief.appendChild(backToScoreBtn);
+            }
+        } catch (error) {
+            console.error('⚠️ Failed to load stat cards:', error);
+            modalDebrief.innerHTML = '';
+        }
     }
-    
+
     // Show modal
     document.getElementById('participantModal').style.display = 'block';
-}
-
-function calculateParticipantStats(participant) {
-    const scores = allParticipants.map(p => p.score);
-    const totalParticipants = scores.length;
-    
-    // Calculate how many participants have lower scores (less privileged)
-    const lessPrivilegedCount = scores.filter(score => score < participant.score).length;
-    
-    // Calculate mode (most frequent score)
-    const scoreFrequency = {};
-    scores.forEach(score => {
-        scoreFrequency[score] = (scoreFrequency[score] || 0) + 1;
-    });
-    const maxFrequency = Math.max(...Object.values(scoreFrequency));
-    const modes = Object.keys(scoreFrequency).filter(score => scoreFrequency[score] === maxFrequency).map(Number);
-    const mode = modes.length === 1 ? modes[0] : modes[0]; // Use first mode if multiple
-    
-    // Calculate median
-    const sortedScores = [...scores].sort((a, b) => a - b);
-    const median = sortedScores.length % 2 === 0
-        ? (sortedScores[sortedScores.length / 2 - 1] + sortedScores[sortedScores.length / 2]) / 2
-        : sortedScores[Math.floor(sortedScores.length / 2)];
-    
-    // Calculate differences
-    const modeDifference = participant.score - mode;
-    const medianDifference = participant.score - median;
-    
-    // Format results with "You are:" prefix
-    const privilegeComparison = `${lessPrivilegedCount} participants out of ${totalParticipants} are less privileged than you`;
-    
-    const modeComparison = modeDifference === 0 
-        ? "You scored exactly at the mode"
-        : `${Math.abs(modeDifference)} points ${modeDifference > 0 ? 'above' : 'below'} the mode`;
-    
-    const medianComparison = medianDifference === 0 
-        ? "You scored exactly at the median"
-        : `${Math.abs(medianDifference)} points ${medianDifference > 0 ? 'above' : 'below'} the median`;
-    
-    return {
-        privilegeComparison,
-        modeComparison,
-        medianComparison,
-        privilegeClass: '',
-        modeClass: '',
-        medianClass: ''
-    };
+    document.body.classList.add('modal-open');
 }
 
 function closeModal() {
     document.getElementById('participantModal').style.display = 'none';
+    document.body.classList.remove('modal-open');
 }
 
 // Navigation function for detailed results
@@ -948,7 +955,7 @@ function viewSpectrum() {
     }
     
     // Navigate to spectrum page
-    window.location.href = `./spectrum.html?id=${eventId}`;
+    window.location.href = `./results.html?id=${eventId}`;
 }
 
 // Function to automatically show current participant's modal
@@ -1041,9 +1048,10 @@ async function renderFreePlayAnalytics() {
     const scoreStats = calculateScoreStats(responses);
     const allScores = responses.map(r => r.score);
     const percentile = calculatePercentile(userScore, allScores);
+    const lessPrivilegedCount = allScores.filter(score => score < userScore).length;
     const questionStats = calculateQuestionStats(responses);
     
-    console.log('📊 Statistics calculated:', { scoreStats, percentile, questionStatsCount: questionStats.length });
+    console.log('📊 Statistics calculated:', { scoreStats, percentile, lessPrivilegedCount, questionStatsCount: questionStats.length });
     
     // Render analytics sections
     const resultsContent = document.querySelector('.results-content');
@@ -1061,6 +1069,26 @@ async function renderFreePlayAnalytics() {
     const category = categorizeScore(userScore, -25, 25);
     const allyTipsHTML = renderTips(allyTipsArray, category);
     
+    // Generate personalized debrief sections
+    // Requirements: 12.1, 12.4, 10.1
+    let debriefHTML = '';
+    try {
+        const { renderFreePlayDebrief } = await import('../debrief-renderer.js');
+        // Pass analytics data to render stat cards
+        const analyticsData = {
+            stats: scoreStats,
+            percentile: percentile,
+            totalParticipants: responses.length,
+            lessPrivilegedCount: lessPrivilegedCount
+        };
+        console.log('[results.js] Calling renderFreePlayDebrief with analyticsData:', analyticsData);
+        debriefHTML = renderFreePlayDebrief(userScore, userAnswers, -25, 25, questions, analyticsData);
+        console.log('[results.js] Debrief HTML length:', debriefHTML.length);
+        console.log('[results.js] Debrief HTML preview:', debriefHTML.substring(0, 500));
+    } catch (error) {
+        console.error('⚠️ Failed to load debrief sections:', error);
+    }
+    
     // Create analytics container
     const analyticsContainer = document.createElement('div');
     analyticsContainer.className = 'analytics-container';
@@ -1068,7 +1096,7 @@ async function renderFreePlayAnalytics() {
         <div class="analytics-section score-comparison">
             <h2>Your Score Comparison</h2>
             <div class="score-highlight">
-                <div class="user-score-large">Your Score: ${userScore > 0 ? '+' : ''}${userScore}</div>
+                <div class="user-score-large">Your Score: ${formatScore(userScore)}</div>
             </div>
             <div class="stats-grid">
                 <div class="stat-card">
@@ -1078,23 +1106,23 @@ async function renderFreePlayAnalytics() {
                 </div>
                 <div class="stat-card">
                     <div class="stat-label">Mean Score</div>
-                    <div class="stat-value">${scoreStats.mean > 0 ? '+' : ''}${scoreStats.mean}</div>
+                    <div class="stat-value">${formatScore(scoreStats.mean)}</div>
                     <div class="stat-description">Average score across all participants</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-label">Median Score</div>
-                    <div class="stat-value">${scoreStats.median > 0 ? '+' : ''}${scoreStats.median}</div>
+                    <div class="stat-value">${formatScore(scoreStats.median)}</div>
                     <div class="stat-description">Middle score when sorted</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-label">Score Range</div>
-                    <div class="stat-value">${scoreStats.min} to ${scoreStats.max > 0 ? '+' : ''}${scoreStats.max}</div>
+                    <div class="stat-value">${formatScore(scoreStats.min)} to ${formatScore(scoreStats.max)}</div>
                     <div class="stat-description">Based on ${responses.length} responses</div>
                 </div>
             </div>
             <div class="share-section">
                 <p class="empty-state-tip">Share the quiz with friends to see how their privilege compares to yours.</p>
-                <button class="share-quiz-btn" onclick="shareQuiz()">
+                <button class="btn btn-primary btn-sm" onclick="shareQuiz()">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <circle cx="18" cy="5" r="3"></circle>
                         <circle cx="6" cy="12" r="3"></circle>
@@ -1106,6 +1134,8 @@ async function renderFreePlayAnalytics() {
                 </button>
             </div>
         </div>
+        
+        ${debriefHTML}
         
         ${allyTipsHTML}
         
@@ -1157,7 +1187,7 @@ function renderScoreHistogram(distribution, userScore) {
                      title="${count} participant${count !== 1 ? 's' : ''} scored ${score}">
                     <span class="bar-count">${count}</span>
                 </div>
-                <div class="histogram-label ${isUserScore ? 'user-score-label' : ''}">${score > 0 ? '+' : ''}${score}</div>
+                <div class="histogram-label ${isUserScore ? 'user-score-label' : ''}">${formatScore(score)}</div>
                 ${isUserScore ? '<div class="user-indicator">You</div>' : ''}
             </div>
         `;
@@ -1243,7 +1273,7 @@ function renderFirstParticipantState(userScore) {
             <div class="analytics-section empty-state">
                 <div class="empty-state-icon">🎉</div>
                 <h2>You're the First Participant!</h2>
-                <div class="user-score-large">Your Score: ${userScore > 0 ? '+' : ''}${userScore}</div>
+                <div class="user-score-large">Your Score: ${formatScore(userScore)}</div>
                 <p class="empty-state-message">
                     You're the first person to complete the free play quiz. 
                     Come back later to see how your score compares to others!
@@ -1251,7 +1281,7 @@ function renderFirstParticipantState(userScore) {
                 <p class="empty-state-tip">
                     Share the quiz with friends to see how their privilege compares to yours.
                 </p>
-                <button class="share-quiz-btn" onclick="shareQuiz()">
+                <button class="btn btn-primary btn-sm" onclick="shareQuiz()">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <circle cx="18" cy="5" r="3"></circle>
                         <circle cx="6" cy="12" r="3"></circle>
@@ -1283,7 +1313,7 @@ function renderEmptyState() {
                 <p class="empty-state-message">
                     We couldn't find your quiz results. Please try taking the quiz again.
                 </p>
-                <a href="/app/questions.html?id=freeplay" class="btn-primary">Take Quiz Again</a>
+                <a href="/app/questions.html?id=freeplay" class="btn btn-primary">Take Quiz Again</a>
             </div>
         </div>
     `;

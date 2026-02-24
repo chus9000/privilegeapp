@@ -8,6 +8,8 @@ let currentUser = null;
 let disabledQuestions = [];
 let createdEventUrl = '';
 let createdEventPin = '';
+let quotaManager = null;
+let quotaUnsubscribe = null;
 
 /**
  * Initialize event creation page on load
@@ -15,9 +17,37 @@ let createdEventPin = '';
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('📝 Event creation page loaded');
     
+    // Debug: Check localStorage
+    const storedUser = localStorage.getItem('firebase_auth_user');
+    console.log('🔍 localStorage firebase_auth_user:', storedUser ? 'EXISTS' : 'NULL');
+    if (storedUser) {
+        try {
+            const parsed = JSON.parse(storedUser);
+            console.log('🔍 Stored user email:', parsed.email);
+            console.log('🔍 Token expires at:', parsed.expiresAt ? new Date(parsed.expiresAt).toISOString() : 'NO EXPIRY');
+            console.log('🔍 Token expired?', parsed.expiresAt ? Date.now() >= parsed.expiresAt : 'N/A');
+        } catch (e) {
+            console.error('❌ Failed to parse stored user:', e);
+        }
+    }
+    
+    // Primary protection: Route guard check
+    // Requirements: 2.1, 3.3, 3.5
+    const allowed = await window.RouteGuard.guardOnLoad();
+    console.log('🔍 Route guard result:', allowed);
+    if (!allowed) {
+        console.log('🛡️ Route guard denied access, stopping execution');
+        return; // Stop execution if redirected
+    }
+    
+    // Secondary protection: Defense-in-depth inline auth check
     // Initialize AuthManager
     if (window.AuthManager) {
         await window.AuthManager.initialize();
+        
+        // Get current user
+        currentUser = window.AuthManager.getCurrentUser();
+        console.log('🔍 Current user after initialize:', currentUser ? currentUser.email : 'NULL');
         
         // Check authentication - redirect if not authenticated
         if (!window.AuthManager.isAuthenticated()) {
@@ -26,13 +56,15 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
         
-        currentUser = window.AuthManager.getCurrentUser();
         console.log('✅ User authenticated:', currentUser.email);
     } else {
         console.error('❌ AuthManager not available');
         window.location.href = '../';
         return;
     }
+    
+    // Initialize quota manager
+    await initializeQuotaDisplay();
     
     // Initialize disabled questions from localStorage
     const stored = localStorage.getItem('disabledQuestions');
@@ -45,6 +77,111 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Update question counter
     updateQuestionCounter();
 });
+
+/**
+ * Initialize quota display with QuotaStateManager
+ * Requirements: 3.1, 3.2, 3.3, 3.5
+ */
+async function initializeQuotaDisplay() {
+    console.log('📊 Initializing quota display');
+    
+    if (!currentUser) {
+        console.error('❌ Cannot initialize quota display: no current user');
+        return;
+    }
+    
+    // Get QuotaStateManager instance
+    if (window.QuotaStateManager) {
+        quotaManager = window.QuotaStateManager;
+        
+        // Initialize with current user
+        await quotaManager.initialize(currentUser.uid);
+        
+        // Subscribe to quota changes
+        quotaUnsubscribe = quotaManager.subscribe((state) => {
+            console.log('🔔 Quota state changed:', state);
+            updateQuotaDisplay(state);
+        });
+        
+        // Initial display update
+        const initialState = quotaManager.getState();
+        updateQuotaDisplay(initialState);
+        
+        console.log('✅ Quota display initialized');
+    } else {
+        console.error('❌ QuotaStateManager not available');
+    }
+}
+
+/**
+ * Update quota display UI elements
+ * Requirements: 3.1, 3.2, 3.3, 3.5
+ * @param {Object} state - Quota state object
+ */
+function updateQuotaDisplay(state) {
+    console.log('🔄 Updating quota display:', state);
+    
+    const quotaContainer = document.getElementById('quotaContainer');
+    const quotaDisplay = document.getElementById('quotaDisplay');
+    const remainingQuota = document.getElementById('remainingQuota');
+    const quotaMessage = document.getElementById('quotaMessage');
+    
+    if (!quotaDisplay || !remainingQuota || !quotaMessage || !quotaContainer) {
+        console.error('❌ Quota display elements not found');
+        return;
+    }
+    
+    // Update quota numbers
+    const eventWord = state.eventCount === 1 ? 'event' : 'events';
+    quotaDisplay.textContent = `${state.eventCount} of ${state.quotaLimit} ${eventWord} created`;
+    remainingQuota.textContent = `${state.remainingQuota} remaining`;
+    
+    // Update visual state based on quota
+    if (state.isAtLimit) {
+        quotaContainer.classList.add('quota-warning');
+        quotaMessage.textContent = 'You have reached the 3-event limit. Delete an event to create a new one.';
+        quotaMessage.style.display = 'block';
+    } else {
+        quotaContainer.classList.remove('quota-warning');
+        quotaMessage.style.display = 'none';
+    }
+    
+    // Update button state based on quota
+    // Requirements: 4.1, 4.2, 4.3, 4.4, 4.5
+    updateButtonState(state);
+    
+    console.log('✅ Quota display updated');
+}
+
+/**
+ * Update create button state based on quota
+ * Requirements: 4.1, 4.2, 4.3, 4.4, 4.5
+ * @param {Object} state - Quota state object
+ */
+function updateButtonState(state) {
+    const createBtn = document.getElementById('createEventBtn');
+    
+    if (!createBtn) {
+        console.error('❌ Create button not found');
+        return;
+    }
+    
+    // Disable button when event count >= 3
+    // Enable button when event count < 3
+    if (state.isAtLimit) {
+        createBtn.disabled = true;
+        createBtn.setAttribute('aria-disabled', 'true');
+        createBtn.title = 'You have reached the 3-event limit. Delete an event to create a new one.';
+        createBtn.classList.add('disabled-quota');
+        console.log('🔒 Create button disabled (at quota limit)');
+    } else {
+        createBtn.disabled = false;
+        createBtn.setAttribute('aria-disabled', 'false');
+        createBtn.title = 'Create a new event';
+        createBtn.classList.remove('disabled-quota');
+        console.log('🔓 Create button enabled');
+    }
+}
 
 /**
  * Set up event listeners for form interactions
@@ -169,7 +306,7 @@ function updateQuestionCounter() {
     
     const counterElement = document.getElementById('questionCount');
     if (counterElement) {
-        counterElement.textContent = `(${enabledQuestions})`;
+        counterElement.textContent = enabledQuestions;
     }
 }
 
@@ -193,7 +330,7 @@ function showQuestionsModal() {
         return `
             <div class="question-item ${isDisabled ? 'disabled' : 'enabled'}" data-index="${index}">
                 <div class="question-text">${escapeHtml(question.text)}</div>
-                <button type="button" class="toggle-question-btn" data-index="${index}">
+                <button type="button" class="btn btn-tertiary btn-sm" data-index="${index}">
                     ${isDisabled ? 'Enable' : 'Disable'}
                 </button>
             </div>
@@ -201,7 +338,7 @@ function showQuestionsModal() {
     }).join('');
     
     // Add event listeners to toggle buttons
-    const toggleButtons = questionsList.querySelectorAll('.toggle-question-btn');
+    const toggleButtons = questionsList.querySelectorAll('.btn-tertiary[data-index]');
     toggleButtons.forEach(btn => {
         btn.addEventListener('click', (e) => {
             const index = parseInt(e.target.dataset.index);
@@ -214,6 +351,21 @@ function showQuestionsModal() {
     
     // Show modal
     modal.style.display = 'flex';
+    document.body.classList.add('modal-open');
+    
+    // Add click-outside-to-dismiss handler (remove any existing listener first)
+    modal.removeEventListener('click', handleQuestionsModalClick);
+    modal.addEventListener('click', handleQuestionsModalClick);
+}
+
+/**
+ * Handle click events on questions modal (for click-outside-to-dismiss)
+ */
+function handleQuestionsModalClick(e) {
+    const modal = document.getElementById('questionsModal');
+    if (e.target === modal) {
+        hideQuestionsModal();
+    }
 }
 
 /**
@@ -223,6 +375,9 @@ function hideQuestionsModal() {
     const modal = document.getElementById('questionsModal');
     if (modal) {
         modal.style.display = 'none';
+        document.body.classList.remove('modal-open');
+        // Remove click-outside handler when modal is closed
+        modal.removeEventListener('click', handleQuestionsModalClick);
     }
 }
 
@@ -402,7 +557,7 @@ async function handleFormSubmit(e) {
         showEventCreated(createdEventUrl, pin);
         
     } catch (error) {
-        // Requirements: 15.5, 15.7 - Log Firebase errors with context and show user-friendly message
+        // Requirements: 6.2, 6.4, 6.5 - Classify error, log with context, and maintain UI state
         console.error('❌ Firebase operation failed: createEvent', {
             operation: 'saveEvent',
             title: title,
@@ -412,17 +567,50 @@ async function handleFormSubmit(e) {
             stack: error.stack
         });
         
-        // Show error message with retry option (Requirements: 15.2)
-        displayErrors([{
-            field: 'general',
-            message: 'Failed to create event. Please check your connection and try again.'
-        }], () => {
-            console.log('🔄 User requested retry...');
-            // Retry event creation
-            createEvent();
-        });
+        // Get current event count for error classification
+        let currentEventCount = 0;
+        if (quotaManager) {
+            currentEventCount = quotaManager.getState().eventCount;
+        }
         
-        // Re-enable submit button
+        // Classify the error
+        const errorType = classifyError(error, currentEventCount);
+        
+        // Handle based on error type
+        if (errorType === 'quota') {
+            // Log quota error (Requirements: 6.4)
+            logQuotaError(error, currentEventCount, currentUser.uid);
+            
+            // Show quota error modal (Requirements: 6.1, 6.3)
+            showQuotaError(currentEventCount);
+        } else if (errorType === 'permission') {
+            // Log permission error (Requirements: 6.4)
+            logPermissionError(error, currentUser.uid);
+            
+            // Show generic permission error
+            displayErrors([{
+                field: 'general',
+                message: 'You do not have permission to create events. Please check your account settings.'
+            }]);
+        } else if (errorType === 'network') {
+            // Show network error with retry option (Requirements: 15.2)
+            displayErrors([{
+                field: 'general',
+                message: 'Failed to create event. Please check your connection and try again.'
+            }], () => {
+                console.log('🔄 User requested retry...');
+                // Retry by resubmitting the form
+                handleFormSubmit({ preventDefault: () => {} });
+            });
+        } else {
+            // Show generic error
+            displayErrors([{
+                field: 'general',
+                message: 'Failed to create event. Please try again.'
+            }]);
+        }
+        
+        // Re-enable submit button (Requirements: 6.5 - UI remains functional)
         if (submitBtn) {
             submitBtn.disabled = false;
             submitBtn.textContent = 'Create Event';
@@ -553,6 +741,146 @@ function showErrorNotification(message, onRetry = null) {
 }
 
 /**
+ * Classify error type for appropriate handling
+ * Requirements: 6.2
+ * @param {Error} error - Firebase error object
+ * @param {number} currentEventCount - Current number of events user has created
+ * @returns {string} Error type: 'quota', 'permission', 'network', 'unknown'
+ */
+function classifyError(error, currentEventCount) {
+    console.log('🔍 Classifying error:', { code: error.code, eventCount: currentEventCount });
+    
+    // Check if error is permission denied
+    if (error.code === 'PERMISSION_DENIED') {
+        // If user is at quota limit, it's a quota error
+        if (currentEventCount >= 3) {
+            console.log('📊 Classified as quota error');
+            return 'quota';
+        }
+        // Otherwise, it's a generic permission error
+        console.log('🔒 Classified as permission error');
+        return 'permission';
+    }
+    
+    // Check for network errors
+    if (error.code === 'NETWORK_ERROR' || error.code === 'UNAVAILABLE') {
+        console.log('🌐 Classified as network error');
+        return 'network';
+    }
+    
+    // All other errors are unknown
+    console.log('❓ Classified as unknown error');
+    return 'unknown';
+}
+
+/**
+ * Log quota error with context
+ * Requirements: 6.4
+ * @param {Error} error - Firebase error object
+ * @param {number} eventCount - Current event count
+ * @param {string} userId - User ID
+ */
+function logQuotaError(error, eventCount, userId) {
+    console.error('❌ Quota limit reached during event creation', {
+        operation: 'createEvent',
+        errorCode: error.code,
+        errorMessage: error.message,
+        currentEventCount: eventCount,
+        quotaLimit: 3,
+        userId: userId,
+        timestamp: new Date().toISOString()
+    });
+}
+
+/**
+ * Log permission error with context
+ * Requirements: 6.4
+ * @param {Error} error - Firebase error object
+ * @param {string} userId - User ID
+ */
+function logPermissionError(error, userId) {
+    console.error('❌ Permission denied during event creation', {
+        operation: 'createEvent',
+        errorCode: error.code,
+        errorMessage: error.message,
+        userId: userId,
+        timestamp: new Date().toISOString()
+    });
+}
+
+/**
+ * Show quota error modal to user
+ * Requirements: 6.1, 6.3, 6.5
+ * @param {number} eventCount - Current event count
+ */
+function showQuotaError(eventCount) {
+    console.log('📊 Showing quota error modal');
+    
+    const message = `
+        You've reached the 3-event limit (currently have ${eventCount} events).
+        To create a new event, please delete one of your existing events from the dashboard.
+        
+        We're working on licensing plans that will allow higher limits!
+    `;
+    
+    // Create modal overlay
+    const overlay = document.createElement('div');
+    overlay.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 2000;
+    `;
+    
+    // Create modal
+    const modal = document.createElement('div');
+    modal.className = 'error-modal';
+    modal.style.cssText = `
+        background: white;
+        border-radius: 12px;
+        padding: 24px;
+        max-width: 500px;
+        width: 90%;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    `;
+    
+    // Create modal content
+    modal.innerHTML = `
+        <h3 style="margin: 0 0 16px 0; color: #1f2937; font-size: 20px;">Event Limit Reached</h3>
+        <p style="margin: 0 0 24px 0; color: #4b5563; line-height: 1.6; white-space: pre-line;">${message}</p>
+        <div class="error-actions" style="display: flex; gap: 12px; justify-content: flex-end;">
+            <button class="btn-secondary" id="cancelQuotaError" style="padding: 10px 20px; border: 1px solid #d1d5db; background: white; color: #374151; border-radius: 6px; cursor: pointer; font-weight: 600;">Cancel</button>
+            <button class="btn-primary" id="goToDashboard" style="padding: 10px 20px; border: none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 6px; cursor: pointer; font-weight: 600;">Go to Dashboard</button>
+        </div>
+    `;
+    
+    overlay.appendChild(modal);
+    document.body.appendChild(overlay);
+    
+    // Add event listeners
+    document.getElementById('cancelQuotaError').addEventListener('click', () => {
+        overlay.remove();
+    });
+    
+    document.getElementById('goToDashboard').addEventListener('click', () => {
+        window.location.href = './';
+    });
+    
+    // Close on overlay click
+    overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) {
+            overlay.remove();
+        }
+    });
+}
+
+/**
  * Clear all error messages
  */
 function clearErrors() {
@@ -664,5 +992,22 @@ function escapeHtml(text) {
     div.textContent = text;
     return div.innerHTML;
 }
+
+/**
+ * Cleanup function for page unload
+ */
+window.addEventListener('beforeunload', () => {
+    console.log('🧹 Cleaning up event creation page');
+    
+    // Cleanup quota manager
+    if (quotaUnsubscribe) {
+        quotaUnsubscribe();
+        quotaUnsubscribe = null;
+    }
+    
+    if (quotaManager) {
+        quotaManager.cleanup();
+    }
+});
 
 console.log('📝 Event creation module loaded');

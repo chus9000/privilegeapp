@@ -1,7 +1,7 @@
 /**
  * Unit tests for Ally Tips on Event Results Pages
  * 
- * Tests that ally tips are displayed on event results pages (both results.html and spectrum.html)
+ * Tests that ally tips are displayed on event results pages (results.html)
  * Requirements: 2.4, 9.1
  */
 
@@ -43,36 +43,6 @@ describe('Event Results Ally Tips Integration', () => {
             
             const allyTipsContainer = modalBody.querySelector('#modalAllyTips');
             expect(allyTipsContainer).toBeTruthy();
-        });
-    });
-    
-    describe('spectrum.html modal structure', () => {
-        beforeEach(() => {
-            // Load the spectrum.html file
-            const html = fs.readFileSync(path.resolve(__dirname, '../app/spectrum.html'), 'utf8');
-            dom = new JSDOM(html, { runScripts: 'dangerously', resources: 'usable' });
-            document = dom.window.document;
-            window = dom.window;
-            
-            global.document = document;
-            global.window = window;
-        });
-        
-        test('should have ally tips container in participant modal', () => {
-            const modal = document.getElementById('participantModal');
-            expect(modal).toBeTruthy();
-            
-            const allyTipsContainer = document.getElementById('modalAllyTips');
-            expect(allyTipsContainer).toBeTruthy();
-            expect(allyTipsContainer.className).toContain('modal-ally-tips');
-        });
-        
-        test('should load ally-tips.js script', () => {
-            const scripts = Array.from(document.querySelectorAll('script'));
-            const allyTipsScript = scripts.find(script => 
-                script.src && script.src.includes('ally-tips.js')
-            );
-            expect(allyTipsScript).toBeTruthy();
         });
     });
     

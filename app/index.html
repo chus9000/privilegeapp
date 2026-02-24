@@ -3,27 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Disable Firebase Hosting auto-configuration -->
+    <meta name="firebase-config" content="manual">
     <title>Event Dashboard - Privilege Spectrum</title>
     <link rel="stylesheet" href="../styles.css">
     <link rel="icon" type="image/x-icon" href="../favicon.ico">
 </head>
 <body>
-    <!-- Logo Header -->
-    <div class="logo-header">
-        <a href="/" class="logo-small">
-            <div class="logo-small-line-1">THE</div>
-            <div class="logo-small-line-2">PRIVILEGE</div>
-            <div class="logo-small-line-3">SPECTRUM</div>
-        </a>
-    </div>
+    <!-- Header with Logo and Actions -->
+    <header class="app-header">
+        <div class="header-left">
+            <a href="./" class="logo-small">
+                <div class="logo-small-line-2">Privilege</div>
+                <div class="logo-small-line-3">Spectrum</div>
+                <span class="logo-badge">manager</span>
+            </a>
+        </div>
+        <div class="header-right">
+            <button id="createNewEventBtnHeader" class="btn btn-primary btn-sm" aria-label="Create new event">Create New Event</button>
+            <div class="user-menu">
+                <button id="userMenuBtn" class="user-menu-btn">
+                    <img id="userAvatar" class="user-avatar" src="" alt="User" style="display: none;">
+                    <span id="userName" class="user-name"></span>
+                    <svg class="user-menu-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                        <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+                <div id="userDropdown" class="user-dropdown" style="display: none;">
+                    <div class="user-dropdown-header">
+                        <div id="userEmailDropdown" class="user-email"></div>
+                    </div>
+                    <button id="signOutBtn" class="user-dropdown-item">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                            <path d="M6 14H3C2.44772 14 2 13.5523 2 13V3C2 2.44772 2.44772 2 3 2H6M11 11L14 8M14 8L11 5M14 8H6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Sign Out
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
 
     <div class="container">
+        <!-- Sign-In Required State (shown when not authenticated) -->
+        <div id="signInRequired" class="empty-state" style="display: none;">
+            <div class="empty-state-icon">
+                <i data-lucide="lock"></i>
+            </div>
+            <h2>Sign In Required</h2>
+            <p>Please sign in with your Google account to create and manage events.</p>
+            <button id="signInBtn" class="btn btn-primary">Sign in with Google</button>
+            <button id="backToHomeBtn" class="btn btn-secondary" style="margin-top: 1rem;">Back to Home</button>
+        </div>
+
         <!-- Dashboard Header -->
         <div class="dashboard-header">
             <h1>My Events</h1>
-            <div class="dashboard-actions">
-                <button id="createNewEventBtn" class="primary-btn">Create New Event</button>
-                <button id="signOutBtn" class="secondary-btn">Sign Out</button>
+            <div id="dashboardQuotaDisplay" class="quota-info" role="status" aria-live="polite" style="display: none;">
+                <span id="dashboardQuotaText" class="quota-text" aria-label="Event quota status"></span>
             </div>
         </div>
 
@@ -32,12 +69,26 @@
             <!-- Events will be dynamically rendered here -->
         </div>
 
+        <!-- Quota Limit Banner -->
+        <div id="quotaBanner" class="quota-banner" role="alert" aria-live="assertive" style="display: none;">
+            <div class="banner-content">
+                <h4>Event Limit Reached</h4>
+                <p>
+                    You've created 3 events, which is the current limit. 
+                    Good news: we're working on licensing plans that will allow you to create more events!
+                    For now, you can delete an event to create a new one.
+                </p>
+            </div>
+        </div>
+
         <!-- Empty State -->
         <div id="emptyState" class="empty-state" style="display: none;">
-            <div class="empty-state-icon">📋</div>
+            <div class="empty-state-icon">
+                <i data-lucide="clipboard-list"></i>
+            </div>
             <h2>No Events Yet</h2>
             <p>Create your first event to get started!</p>
-            <button id="createFirstEventBtn" class="primary-btn">Create Your First Event</button>
+            <button id="createFirstEventBtn" class="btn btn-primary">Create Your First Event</button>
         </div>
 
         <!-- Loading State -->
@@ -65,23 +116,27 @@
                             <span id="detailsEventTitle" class="info-value"></span>
                         </div>
                         <div class="info-item">
-                            <span class="info-label">PIN:</span>
-                            <span id="detailsEventPin" class="info-value"></span>
-                        </div>
-                        <div class="info-item">
                             <span class="info-label">Created:</span>
                             <span id="detailsEventDate" class="info-value"></span>
                         </div>
                         <div class="info-item">
-                            <span class="info-label">Participants:</span>
-                            <span id="detailsParticipantCount" class="info-value"></span>
+                            <span class="info-label">Number of questions:</span>
+                            <span id="detailsQuestionCount" class="info-value"></span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Link:</span>
+                            <a id="detailsEventLink" class="info-value" href="#" target="_blank"></a>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">PIN:</span>
+                            <span id="detailsEventPin" class="info-value"></span>
                         </div>
                     </div>
                 </div>
 
                 <!-- Score Statistics Section -->
                 <div class="event-details-section">
-                    <h3>Score Statistics</h3>
+                    <h3 id="detailsScoreStatsTitle">Score Statistics</h3>
                     <div class="stats-grid">
                         <div class="stat-card">
                             <div class="stat-label">Mean Score</div>
@@ -102,21 +157,55 @@
                     </div>
                 </div>
 
-                <!-- Participants List Section -->
-                <div class="event-details-section">
-                    <h3>Participants</h3>
-                    <div id="detailsParticipantsList" class="participants-list">
-                        <!-- Participants will be rendered here -->
-                    </div>
-                    <div id="detailsNoParticipants" class="no-participants" style="display: none;">
-                        <p>No participants yet. Share the event link to get started!</p>
-                    </div>
-                </div>
-
                 <!-- Actions Section -->
                 <div class="event-details-actions">
-                    <button id="viewSpectrumBtn" class="primary-btn">View Spectrum</button>
-                    <button onclick="closeEventDetailsModal()" class="secondary-btn">Close</button>
+                    <button id="viewDetailedResultsBtn" class="btn btn-primary">View Detailed Results</button>
+                    <button id="viewSpectrumBtn" class="btn btn-secondary">View Spectrum</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rename Event Modal -->
+    <div id="renameEventModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Duplicate Event</h2>
+                <button class="close-btn" onclick="closeRenameModal()">&times;</button>
+            </div>
+            
+            <div class="modal-body">
+                <p style="color: #64748b; margin-bottom: 16px;">Enter a name for the duplicated event:</p>
+                <input type="text" id="renameEventInput" placeholder="Event name" maxlength="100" />
+            </div>
+            
+            <div class="modal-footer">
+                <div class="modal-buttons">
+                    <button class="btn btn-secondary" onclick="closeRenameModal()">Cancel</button>
+                    <button class="btn btn-primary" onclick="confirmRename()">Duplicate</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Event Modal -->
+    <div id="deleteEventModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Delete Event</h2>
+                <button class="close-btn" onclick="closeDeleteModal()">&times;</button>
+            </div>
+            
+            <div class="modal-body">
+                <p style="color: #64748b; margin-bottom: 8px;">Are you sure you want to delete this event?</p>
+                <p style="color: #1e293b; font-weight: 600; margin-bottom: 16px;" id="deleteEventTitle"></p>
+                <p style="color: #dc2626; font-size: 0.9rem;">⚠️ This action cannot be undone.</p>
+            </div>
+            
+            <div class="modal-footer">
+                <div class="modal-buttons">
+                    <button class="btn btn-secondary" onclick="closeDeleteModal()">Cancel</button>
+                    <button class="btn btn-danger" onclick="confirmDelete()">Delete</button>
                 </div>
             </div>
         </div>
@@ -125,17 +214,41 @@
     <!-- Footer -->
     <div class="footer">
         <div class="footer-content">
-            <div>© 2024 The Privilege Spectrum. All rights reserved.</div>
-            <div>
-                <a href="/privacy.html">Privacy Policy</a> | 
-                <a href="/terms.html">Terms of Service</a>
-            </div>
+            <div>© 2025-2026 Privilege Spectrum. All rights reserved.</div>
+            <div>Any feedback? reach out to <a href="mailto:hi@jesusmartin.eu">hi@jesusmartin.eu</a> | <a href="/privacy.html">Privacy</a> | <a href="/terms.html">Terms</a></div>
         </div>
     </div>
 
     <!-- Scripts -->
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Firebase SDK v9 (compat mode) -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    
+    <script src="../firebase-config.js"></script>
     <script src="../auth-manager.js"></script>
-    <script src="../firebase-config.js" type="module"></script>
-    <script src="dashboard.js" type="module"></script>
+    <script src="../data-manager.js"></script>
+    <script src="../route-guard.js"></script>
+    <script src="../app-header.js"></script>
+    <script src="quota-manager.js"></script>
+    <script src="dashboard.js"></script>
+    
+    <!-- Initialize Lucide Icons -->
+    <script>
+        // Initialize icons when DOM is ready and after any dynamic content
+        if (window.lucide) {
+            lucide.createIcons();
+        }
+        
+        // Re-initialize icons whenever needed (for dynamic content)
+        window.initLucideIcons = function() {
+            if (window.lucide) {
+                lucide.createIcons();
+            }
+        };
+    </script>
 </body>
 </html>

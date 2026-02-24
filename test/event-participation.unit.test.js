@@ -597,10 +597,10 @@ describe('Event Participation - Authentication Check', () => {
       const eventId = 'test-event-123';
 
       // Act
-      const resultsUrl = `results.html?id=${eventId}`;
+      const resultsUrl = `score.html?id=${eventId}`;
 
       // Assert
-      expect(resultsUrl).toBe('results.html?id=test-event-123');
+      expect(resultsUrl).toBe('score.html?id=test-event-123');
     });
 
     test('should construct correct results URL for free play', () => {
@@ -608,10 +608,180 @@ describe('Event Participation - Authentication Check', () => {
       const eventId = 'freeplay';
 
       // Act
-      const resultsUrl = `results.html?id=${eventId}`;
+      const resultsUrl = `score.html?id=${eventId}`;
 
       // Assert
-      expect(resultsUrl).toBe('results.html?id=freeplay');
+      expect(resultsUrl).toBe('score.html?id=freeplay');
+    });
+  });
+
+  describe('Session participant storage (Requirements 2.3, 2.4)', () => {
+    let mockSessionStorage;
+
+    beforeEach(() => {
+      // Create a fresh sessionStorage mock for each test
+      mockSessionStorage = {
+        _store: {},
+        getItem(key) {
+          return this._store[key] || null;
+        },
+        setItem(key, value) {
+          this._store[key] = value;
+        },
+        removeItem(key) {
+          delete this._store[key];
+        },
+        clear() {
+          this._store = {};
+        }
+      };
+    });
+
+    test('should store participant ID in sessionStorage with correct key format', () => {
+      // Arrange
+      const eventId = 'test-event-123';
+      const participantId = 'participant-abc-456';
+
+      // Act - Simulate storeSessionParticipant function
+      mockSessionStorage.setItem(`participant_${eventId}`, participantId);
+
+      // Assert
+      const stored = mockSessionStorage.getItem(`participant_${eventId}`);
+      expect(stored).toBe(participantId);
+    });
+
+    test('should store participant ID for free play mode', () => {
+      // Arrange
+      const eventId = 'freeplay';
+      const participantId = 'participant-xyz-789';
+
+      // Act
+      mockSessionStorage.setItem(`participant_${eventId}`, participantId);
+
+      // Assert
+      const stored = mockSessionStorage.getItem(`participant_freeplay`);
+      expect(stored).toBe(participantId);
+    });
+
+    test('should retrieve participant ID from sessionStorage', () => {
+      // Arrange
+      const eventId = 'test-event-123';
+      const participantId = 'participant-abc-456';
+      mockSessionStorage.setItem(`participant_${eventId}`, participantId);
+
+      // Act
+      const retrieved = mockSessionStorage.getItem(`participant_${eventId}`);
+
+      // Assert
+      expect(retrieved).toBe(participantId);
+    });
+
+    test('should return null for non-existent session participant', () => {
+      // Arrange
+      const eventId = 'nonexistent-event';
+
+      // Act
+      const retrieved = mockSessionStorage.getItem(`participant_${eventId}`);
+
+      // Assert
+      expect(retrieved).toBeNull();
+    });
+
+    test('should overwrite existing session participant for same event', () => {
+      // Arrange
+      const eventId = 'test-event-123';
+      const oldParticipantId = 'participant-old-123';
+      const newParticipantId = 'participant-new-456';
+
+      // Act
+      mockSessionStorage.setItem(`participant_${eventId}`, oldParticipantId);
+      mockSessionStorage.setItem(`participant_${eventId}`, newParticipantId);
+
+      // Assert
+      const stored = mockSessionStorage.getItem(`participant_${eventId}`);
+      expect(stored).toBe(newParticipantId);
+      expect(stored).not.toBe(oldParticipantId);
+    });
+
+    test('should store different participants for different events', () => {
+      // Arrange
+      const eventId1 = 'event-123';
+      const eventId2 = 'event-456';
+      const participantId1 = 'participant-abc';
+      const participantId2 = 'participant-xyz';
+
+      // Act
+      mockSessionStorage.setItem(`participant_${eventId1}`, participantId1);
+      mockSessionStorage.setItem(`participant_${eventId2}`, participantId2);
+
+      // Assert
+      expect(mockSessionStorage.getItem(`participant_${eventId1}`)).toBe(participantId1);
+      expect(mockSessionStorage.getItem(`participant_${eventId2}`)).toBe(participantId2);
+    });
+
+    test('should handle special characters in event ID', () => {
+      // Arrange
+      const eventId = 'event-with-special_chars-123';
+      const participantId = 'participant-abc-456';
+
+      // Act
+      mockSessionStorage.setItem(`participant_${eventId}`, participantId);
+
+      // Assert
+      const stored = mockSessionStorage.getItem(`participant_${eventId}`);
+      expect(stored).toBe(participantId);
+    });
+
+    test('should handle special characters in participant ID', () => {
+      // Arrange
+      const eventId = 'test-event-123';
+      const participantId = 'participant-with-special_chars-abc-123';
+
+      // Act
+      mockSessionStorage.setItem(`participant_${eventId}`, participantId);
+
+      // Assert
+      const stored = mockSessionStorage.getItem(`participant_${eventId}`);
+      expect(stored).toBe(participantId);
+    });
+
+    test('should fallback to localStorage if sessionStorage fails', () => {
+      // Arrange
+      const eventId = 'test-event-123';
+      const participantId = 'participant-abc-456';
+      const mockSessionStorageWithError = {
+        setItem() {
+          throw new Error('sessionStorage is disabled');
+        }
+      };
+
+      // Act - Simulate fallback logic
+      let stored = false;
+      try {
+        mockSessionStorageWithError.setItem(`participant_${eventId}`, participantId);
+      } catch (error) {
+        // Fallback to localStorage
+        mockLocalStorage.setItem(`session_participant_${eventId}`, participantId);
+        stored = true;
+      }
+
+      // Assert
+      expect(stored).toBe(true);
+      expect(mockLocalStorage.getItem(`session_participant_${eventId}`)).toBe(participantId);
+    });
+
+    test('should clear session participant when sessionStorage is cleared', () => {
+      // Arrange
+      const eventId = 'test-event-123';
+      const participantId = 'participant-abc-456';
+      mockSessionStorage.setItem(`participant_${eventId}`, participantId);
+
+      // Act
+      mockSessionStorage.clear();
+
+      // Assert
+      const stored = mockSessionStorage.getItem(`participant_${eventId}`);
+      expect(stored).toBeNull();
     });
   });
 });

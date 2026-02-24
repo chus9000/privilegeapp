@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Results - Privilege Spectrum</title>
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
+    <link rel="manifest" href="../site.webmanifest">
+</head>
+<body class="score-page">
+    <div class="results-header-new">
+        <div class="header-logo">
+            <a href="../index.html" class="logo-compact">
+                <span class="logo-text">Privilege</span>
+                <span class="logo-text">Spectrum</span>
+            </a>
+        </div>
+        
+        <div class="header-title">
+            <h1>Your Personal Results</h1>
+        </div>
+    </div>
+    
+    <div class="score-layout">
+        <div class="score-content">
+            <!-- Participant header with avatar and name -->
+            <div id="participantHeader" class="participant-header"></div>
+            
+            <!-- Debrief container populated by JavaScript -->
+            <div id="debriefContainer"></div>
+            
+            <!-- Ally tips container -->
+            <div id="allyTipsContainer"></div>
+        </div>
+        
+        <div class="score-actions">
+            <button id="viewResultsBtn" class="btn btn-primary">Position in the Spectrum</button>
+            <button id="viewDetailedBtn" class="btn btn-secondary">Detailed results</button>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div>© 2025-2026 Privilege Spectrum. All rights reserved.</div>
+            <div>Any feedback? reach out to <a href="mailto:hi@jesusmartin.eu">hi@jesusmartin.eu</a> | <a href="/privacy.html">Privacy</a> | <a href="/terms.html">Terms</a></div>
+        </div>
+    </footer>
+
+    <script src="../firebase-config.js"></script>
+    <script src="../questions.js"></script>
+    <script src="../free-play-analytics.js"></script>
+    <script src="../ally-tips.js"></script>
+    <script type="module" src="./score.js"></script>
+</body>
+</html>

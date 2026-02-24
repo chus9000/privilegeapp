@@ -6,9 +6,8 @@
  * **Validates: Requirements 10.5, 10.7, 10.8**
  * 
  * For any event with an event ID, the participation URL should follow the pattern
- * `/app/questions.html?id={eventId}`, the results URL should follow 
- * `/app/results.html?id={eventId}`, and the spectrum URL should follow 
- * `/app/spectrum.html?id={eventId}`.
+ * `/app/questions.html?id={eventId}` and the results URL should follow 
+ * `/app/results.html?id={eventId}`.
  */
 
 import { describe, test } from 'vitest';
@@ -26,13 +25,6 @@ function generateQuestionsUrl(eventId) {
  */
 function generateResultsUrl(eventId) {
   return `/app/results.html?id=${encodeURIComponent(eventId)}`;
-}
-
-/**
- * Generate a spectrum URL for an event
- */
-function generateSpectrumUrl(eventId) {
-  return `/app/spectrum.html?id=${encodeURIComponent(eventId)}`;
 }
 
 /**
@@ -127,36 +119,7 @@ describe('Property 11: Event URL Structure', () => {
     );
   });
 
-  test('**Validates: Requirements 10.8** - spectrum URL follows correct pattern', () => {
-    fc.assert(
-      fc.property(
-        eventIdGen,
-        (eventId) => {
-          // Generate spectrum URL
-          const url = generateSpectrumUrl(eventId);
-          
-          // Property: URL should follow pattern /app/spectrum.html?id={eventId}
-          const isValidStructure = validateUrlStructure(url, '/app/spectrum.html');
-          const parsedId = parseEventIdFromUrl(url);
-          
-          if (!isValidStructure) {
-            console.log(`FAILED: Invalid URL structure for spectrum: ${url}`);
-            return false;
-          }
-          
-          if (parsedId !== eventId) {
-            console.log(`FAILED: Event ID mismatch. Expected: ${eventId}, Got: ${parsedId}`);
-            return false;
-          }
-          
-          return true;
-        }
-      ),
-      { numRuns: 100 }
-    );
-  });
-
-  test('**Validates: Requirements 10.5, 10.7, 10.8** - all URLs for same event share same ID', () => {
+  test('**Validates: Requirements 10.5, 10.7** - all URLs for same event share same ID', () => {
     fc.assert(
       fc.property(
         eventIdGen,

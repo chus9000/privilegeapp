@@ -117,6 +117,16 @@ describe('Dashboard Functionality', () => {
     window.localStorage.setItem('firebase_auth_user', JSON.stringify(mockUser));
     await authManager.initialize();
     
+    // Mock RouteGuard
+    const mockRouteGuard = {
+      guardOnLoad: vi.fn().mockResolvedValue(true), // Allow access by default
+      guard: vi.fn().mockResolvedValue(true),
+      initialize: vi.fn().mockResolvedValue(undefined),
+      isProtectedRoute: vi.fn().mockReturnValue(true),
+      redirectToLanding: vi.fn()
+    };
+    window.RouteGuard = mockRouteGuard;
+    
     // Mock FirebaseAPI
     firebaseAPI = {
       loadEventsByCreator: vi.fn(),
@@ -526,8 +536,8 @@ describe('Dashboard Functionality', () => {
       const viewDetailsBtn = document.querySelector('.view-details-btn');
       viewDetailsBtn.click();
       
-      // Verify navigation to spectrum page
-      expect(navigationSpy).toHaveBeenCalledWith('/app/spectrum.html?id=event_123');
+      // Verify navigation to results page
+      expect(navigationSpy).toHaveBeenCalledWith('/app/results.html?id=event_123');
     });
 
 

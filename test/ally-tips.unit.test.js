@@ -45,19 +45,19 @@ describe('Ally Tips Module', () => {
         test('should return high privilege tips for high scores', () => {
             const tips = getTipsForScore(15, -25, 25);
             expect(tips).toEqual(allyTips.highPrivilege);
-            expect(tips).toContain('Use your privilege to amplify marginalized voices');
+            expect(tips.some(tip => tip.includes('Use your privilege to amplify marginalized voices'))).toBe(true);
         });
         
         test('should return low privilege tips for low scores', () => {
             const tips = getTipsForScore(-15, -25, 25);
             expect(tips).toEqual(allyTips.lowPrivilege);
-            expect(tips).toContain('Connect with supportive communities');
+            expect(tips.some(tip => tip.includes('Connect with supportive communities'))).toBe(true);
         });
         
         test('should return neutral tips for neutral scores', () => {
             const tips = getTipsForScore(0, -25, 25);
             expect(tips).toEqual(allyTips.neutral);
-            expect(tips).toContain('Recognize that privilege is intersectional');
+            expect(tips.some(tip => tip.includes('Recognize that privilege is intersectional'))).toBe(true);
         });
         
         test('should use default range when not specified', () => {
@@ -77,6 +77,8 @@ describe('Ally Tips Module', () => {
             expect(html).toContain('Tip 2');
             expect(html).toContain('Tip 3');
             expect(html).toContain('ally-tip-item');
+            expect(html).toContain('learning-resources');
+            expect(html).toContain('Learning Resources');
         });
         
         test('should render correct title for each category', () => {
@@ -98,6 +100,16 @@ describe('Ally Tips Module', () => {
             
             const tipCount = (html.match(/ally-tip-item/g) || []).length;
             expect(tipCount).toBe(tips.length);
+        });
+        
+        test('should render learning resources section', () => {
+            const tips = ['Test tip'];
+            const html = renderTips(tips, 'highPrivilege');
+            
+            expect(html).toContain('learning-resources');
+            expect(html).toContain('Learning Resources');
+            expect(html).toContain('resource-item');
+            expect(html).toContain('Recommended based on your specific assessment results');
         });
     });
     

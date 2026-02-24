@@ -22,15 +22,16 @@ describe('Real-Time Analytics Updates', () => {
                 <div id="detailsEventTitle"></div>
                 <div id="detailsEventPin"></div>
                 <div id="detailsEventDate"></div>
-                <div id="detailsParticipantCount"></div>
+                <div id="detailsQuestionCount"></div>
+                <a id="detailsEventLink" href="#"></a>
+                <h3 id="detailsScoreStatsTitle">Score Statistics</h3>
                 <div id="detailsMeanScore"></div>
                 <div id="detailsMedianScore"></div>
                 <div id="detailsModeScore"></div>
                 <div id="detailsScoreRange"></div>
-                <div id="detailsParticipantsList"></div>
-                <div id="detailsNoParticipants" style="display: none;"></div>
                 <div id="eventDetailsModal" style="display: none;"></div>
                 <button id="viewSpectrumBtn"></button>
+                <button id="viewDetailedResultsBtn"></button>
             </body>
             </html>
         `);
@@ -99,20 +100,15 @@ describe('Real-Time Analytics Updates', () => {
             const participants = eventData.participants || [];
             const participantCount = participants.length;
             
-            document.getElementById('detailsParticipantCount').textContent = participantCount;
+            // Update score statistics title with participant count
+            const statsTitle = document.getElementById('detailsScoreStatsTitle');
+            statsTitle.textContent = `Score Statistics for ${participantCount} participant${participantCount !== 1 ? 's' : ''}`;
             
             if (participantCount > 0) {
                 const stats = calculateEventStatistics(participants);
                 displayEventStatistics(stats);
-                displayParticipantsList(participants);
-                
-                document.getElementById('detailsParticipantsList').style.display = 'block';
-                document.getElementById('detailsNoParticipants').style.display = 'none';
             } else {
                 displayEmptyStatistics();
-                
-                document.getElementById('detailsParticipantsList').style.display = 'none';
-                document.getElementById('detailsNoParticipants').style.display = 'block';
             }
         }
         
@@ -188,38 +184,6 @@ describe('Real-Time Analytics Updates', () => {
             document.getElementById('detailsScoreRange').textContent = '-';
         }
         
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-        
-        function displayParticipantsList(participants) {
-            const listContainer = document.getElementById('detailsParticipantsList');
-            listContainer.innerHTML = '';
-            
-            const sortedParticipants = [...participants].sort((a, b) => b.score - a.score);
-            
-            sortedParticipants.forEach((participant, index) => {
-                const participantItem = document.createElement('div');
-                participantItem.className = 'participant-item';
-                
-                const scoreValue = participant.score > 0 ? `+${participant.score}` : participant.score.toString();
-                const rank = index + 1;
-                
-                participantItem.innerHTML = `
-                    <div class="participant-rank">#${rank}</div>
-                    <div class="participant-avatar">${participant.avatar}</div>
-                    <div class="participant-info">
-                        <div class="participant-name">${escapeHtml(participant.name)}</div>
-                        <div class="participant-score">Score: ${scoreValue}</div>
-                    </div>
-                `;
-                
-                listContainer.appendChild(participantItem);
-            });
-        }
-        
         it('should call FirebaseAPI.onEventUpdate when setting up real-time updates', () => {
             const eventId = 'test-event-123';
             const events = [];
@@ -286,20 +250,15 @@ describe('Real-Time Analytics Updates', () => {
             const participants = eventData.participants || [];
             const participantCount = participants.length;
             
-            document.getElementById('detailsParticipantCount').textContent = participantCount;
+            // Update score statistics title with participant count
+            const statsTitle = document.getElementById('detailsScoreStatsTitle');
+            statsTitle.textContent = `Score Statistics for ${participantCount} participant${participantCount !== 1 ? 's' : ''}`;
             
             if (participantCount > 0) {
                 const stats = calculateEventStatistics(participants);
                 displayEventStatistics(stats);
-                displayParticipantsList(participants);
-                
-                document.getElementById('detailsParticipantsList').style.display = 'block';
-                document.getElementById('detailsNoParticipants').style.display = 'none';
             } else {
                 displayEmptyStatistics();
-                
-                document.getElementById('detailsParticipantsList').style.display = 'none';
-                document.getElementById('detailsNoParticipants').style.display = 'block';
             }
         }
         
@@ -374,46 +333,15 @@ describe('Real-Time Analytics Updates', () => {
             document.getElementById('detailsScoreRange').textContent = '-';
         }
         
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-        
-        function displayParticipantsList(participants) {
-            const listContainer = document.getElementById('detailsParticipantsList');
-            listContainer.innerHTML = '';
-            
-            const sortedParticipants = [...participants].sort((a, b) => b.score - a.score);
-            
-            sortedParticipants.forEach((participant, index) => {
-                const participantItem = document.createElement('div');
-                participantItem.className = 'participant-item';
-                
-                const scoreValue = participant.score > 0 ? `+${participant.score}` : participant.score.toString();
-                const rank = index + 1;
-                
-                participantItem.innerHTML = `
-                    <div class="participant-rank">#${rank}</div>
-                    <div class="participant-avatar">${participant.avatar}</div>
-                    <div class="participant-info">
-                        <div class="participant-name">${escapeHtml(participant.name)}</div>
-                        <div class="participant-score">Score: ${scoreValue}</div>
-                    </div>
-                `;
-                
-                listContainer.appendChild(participantItem);
-            });
-        }
-        
-        it('should update participant count when new participant joins', () => {
+        it('should update participant count in title when new participant joins', () => {
             const eventId = 'test-event-123';
             const events = [{ id: eventId, participants: [] }];
             
             setupRealTimeAnalyticsUpdates(eventId, events);
             
             // Initial state - no participants
-            expect(document.getElementById('detailsParticipantCount').textContent).toBe('');
+            const statsTitle = document.getElementById('detailsScoreStatsTitle');
+            expect(statsTitle.textContent).toBe('Score Statistics');
             
             // Simulate new participant joining
             const updatedEventData = {
@@ -424,8 +352,8 @@ describe('Real-Time Analytics Updates', () => {
             
             realTimeCallback(updatedEventData);
             
-            // Participant count should be updated
-            expect(document.getElementById('detailsParticipantCount').textContent).toBe('1');
+            // Participant count should be updated in title
+            expect(statsTitle.textContent).toBe('Score Statistics for 1 participant');
         });
         
         it('should update statistics when participants join', () => {
@@ -449,7 +377,7 @@ describe('Real-Time Analytics Updates', () => {
             expect(document.getElementById('detailsMedianScore').textContent).toBe('+7.5');
         });
         
-        it('should update participants list when new participant joins', () => {
+        it('should update participant count in title when new participant joins', () => {
             const eventId = 'test-event-123';
             const events = [{ id: eventId, participants: [] }];
             
@@ -465,16 +393,12 @@ describe('Real-Time Analytics Updates', () => {
             
             realTimeCallback(updatedEventData);
             
-            // Participants list should be updated
-            const listContainer = document.getElementById('detailsParticipantsList');
-            const items = listContainer.querySelectorAll('.participant-item');
-            
-            expect(items.length).toBe(2);
-            expect(items[0].querySelector('.participant-name').textContent).toBe('Bob'); // Highest score first
-            expect(items[1].querySelector('.participant-name').textContent).toBe('Alice');
+            // Participant count should be updated in title
+            const statsTitle = document.getElementById('detailsScoreStatsTitle');
+            expect(statsTitle.textContent).toBe('Score Statistics for 2 participants');
         });
         
-        it('should show participants list and hide no participants message when participants exist', () => {
+        it('should update statistics when participants exist', () => {
             const eventId = 'test-event-123';
             const events = [{ id: eventId, participants: [] }];
             
@@ -489,9 +413,10 @@ describe('Real-Time Analytics Updates', () => {
             
             realTimeCallback(updatedEventData);
             
-            // Participants list should be visible
-            expect(document.getElementById('detailsParticipantsList').style.display).toBe('block');
-            expect(document.getElementById('detailsNoParticipants').style.display).toBe('none');
+            // Statistics should be displayed
+            const statsTitle = document.getElementById('detailsScoreStatsTitle');
+            expect(statsTitle.textContent).toBe('Score Statistics for 1 participant');
+            expect(document.getElementById('detailsMeanScore').textContent).toBe('+10');
         });
         
         it('should handle null event data gracefully', () => {
@@ -503,8 +428,9 @@ describe('Real-Time Analytics Updates', () => {
             // Simulate null event data
             realTimeCallback(null);
             
-            // Should not throw error and participant count should remain unchanged
-            expect(document.getElementById('detailsParticipantCount').textContent).toBe('');
+            // Should not throw error and title should remain unchanged
+            const statsTitle = document.getElementById('detailsScoreStatsTitle');
+            expect(statsTitle.textContent).toBe('Score Statistics');
         });
         
         it('should update local events array when real-time update received', () => {

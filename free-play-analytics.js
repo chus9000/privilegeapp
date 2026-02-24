@@ -14,7 +14,7 @@
  */
 async function loadFreePlayResponses() {
     try {
-        console.log('📊 Loading free play responses from Firebase...');
+        console.log('[Analytics] Loading free play responses from Firebase...');
         
         // Load the freeplay event data
         const freeplayData = await window.FirebaseAPI.loadEvent('freeplay');
@@ -50,6 +50,7 @@ function calculateScoreStats(responses) {
         return {
             mean: 0,
             median: 0,
+            mode: 0,
             min: 0,
             max: 0,
             distribution: []
@@ -79,16 +80,22 @@ function calculateScoreStats(responses) {
         scoreFrequency[score] = (scoreFrequency[score] || 0) + 1;
     });
     
+    // Calculate mode (most frequent score)
+    const maxFrequency = Math.max(...Object.values(scoreFrequency));
+    const modes = Object.keys(scoreFrequency).filter(score => scoreFrequency[score] === maxFrequency).map(Number);
+    const mode = modes.length === 1 ? modes[0] : modes[0]; // Use first mode if multiple
+    
     // Convert to array format for histogram
     const distribution = Object.entries(scoreFrequency)
         .map(([score, count]) => ({ score: parseInt(score), count }))
         .sort((a, b) => a.score - b.score);
     
-    console.log('📊 Score statistics:', { mean, median, min, max, totalResponses: responses.length });
+    console.log('[Analytics] Score statistics:', { mean, median, mode, min, max, totalResponses: responses.length });
     
     return {
         mean: Math.round(mean * 10) / 10, // Round to 1 decimal place
         median,
+        mode,
         min,
         max,
         distribution

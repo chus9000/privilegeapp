@@ -216,7 +216,7 @@ open index.html
 
 # Verify Firebase connection
 # Check browser console for:
-# "🔥🔥🔥 Firebase Config v4.0 loaded"
+# "[Firebase] Config v4.0 loaded"
 ```
 
 ## Troubleshooting

@@ -1,8 +1,9 @@
 /**
- * Unit tests for spectrum page
- * Requirements: 7.7, 12.4
+ * Unit tests for results page spectrum functionality
+ * Requirements: 5.1, 5.2, 7.7, 12.4
  * 
  * Tests spectrum rendering, participant highlighting, and mobile scrolling/centering
+ * Updated for spectrum page consolidation - tests results.html instead of spectrum.html
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
@@ -10,14 +11,14 @@ import { JSDOM } from 'jsdom';
 import fs from 'fs';
 import path from 'path';
 
-describe('Spectrum Page Unit Tests', () => {
+describe('Results Page Spectrum Tests', () => {
     let dom;
     let window;
     let document;
     let localStorage;
 
     beforeEach(() => {
-        // Create a minimal HTML structure matching spectrum.html
+        // Create a minimal HTML structure matching results.html
         const html = `
             <!DOCTYPE html>
             <html>
@@ -55,7 +56,7 @@ describe('Spectrum Page Unit Tests', () => {
         `;
 
         dom = new JSDOM(html, {
-            url: 'http://localhost/app/spectrum.html?id=test-event',
+            url: 'http://localhost/app/results.html?id=test-event',
             runScripts: 'dangerously',
             resources: 'usable'
         });

@@ -147,7 +147,7 @@ describe('Ally Tips Integration on Results Pages', () => {
             const category = categorizeScore(10, -25, 25);
             const allyTipsHTML = renderTips(allyTipsArray, category);
             
-            expect(allyTipsHTML).toContain('Based on your privilege awareness');
+            expect(allyTipsHTML).toContain('Based on your privilege status');
             expect(allyTipsHTML).toContain('ways to be a better ally');
         });
         

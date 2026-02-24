@@ -56,12 +56,12 @@ describe('View Spectrum Navigation', () => {
     test('viewSpectrum function navigates to correct URL', () => {
         // Test the navigation logic directly without mocking window.location
         const eventId = 'test-event-123';
-        const expectedUrl = `app/spectrum.html?id=${eventId}`;
+        const expectedUrl = `app/results.html?id=${eventId}`;
         
         // Simulate the viewSpectrum function logic
         let navigationUrl = null;
         if (eventId) {
-            navigationUrl = `app/spectrum.html?id=${eventId}`;
+            navigationUrl = `app/results.html?id=${eventId}`;
         }
 
         // Verify the URL is constructed correctly
@@ -79,7 +79,7 @@ describe('View Spectrum Navigation', () => {
                 console.error('No event ID available for navigation');
                 return;
             }
-            return `app/spectrum.html?id=${eventId}`;
+            return `app/results.html?id=${eventId}`;
         }
 
         // Call the function

@@ -70,8 +70,7 @@ The system follows a client-side architecture with Firebase as the backend servi
 /app/questions.html?id=freeplay      → Free Play Questions
 /app/questions.html?id={eventId}     → Event Questions
 /app/results.html?id=freeplay        → Free Play Results
-/app/results.html?id={eventId}       → Event Results
-/app/spectrum.html?id={eventId}      → Spectrum Visualization
+/app/results.html?id={eventId}       → Event Results & Spectrum Visualization
 ```
 
 ## Components and Interfaces
@@ -681,7 +680,7 @@ localStorage.setItem('cookieConsent', 'accepted');
 
 ### Property 11: Event URL Structure
 
-*For any* event with an event ID, the participation URL should follow the pattern `/app/questions.html?id={eventId}`, the results URL should follow `/app/results.html?id={eventId}`, and the spectrum URL should follow `/app/spectrum.html?id={eventId}`.
+*For any* event with an event ID, the participation URL should follow the pattern `/app/questions.html?id={eventId}`, and the results URL (which includes spectrum visualization) should follow `/app/results.html?id={eventId}`.
 
 **Validates: Requirements 10.5, 10.7, 10.8**
 
@@ -1162,8 +1161,7 @@ const googleProvider = new GoogleAuthProvider();
 │   ├── index.html            # Dashboard (requires auth)
 │   ├── create.html           # Event creation (requires auth)
 │   ├── questions.html        # Questions (free play or event)
-│   ├── results.html          # Results (free play or event)
-│   └── spectrum.html         # Spectrum visualization
+│   └── results.html          # Results and spectrum visualization
 ├── js/
 │   ├── auth-manager.js       # Authentication logic
 │   ├── data-manager.js       # Firebase + localStorage

@@ -41,6 +41,16 @@ if [ ! -f "firebase-security-rules.json" ]; then
     ERRORS=$((ERRORS + 1))
 else
     echo "✅ firebase-security-rules.json exists"
+    
+    # Check for index configuration
+    if grep -q '".indexOn".*"creatorId"' firebase-security-rules.json; then
+        echo "✅ Database index for creatorId is configured"
+    else
+        echo "⚠️  WARNING: Database index for creatorId not found"
+        echo "   The event creation quota feature requires an index on creatorId"
+        echo "   Add '.indexOn': ['creatorId'] under the events node"
+        WARNINGS=$((WARNINGS + 1))
+    fi
 fi
 
 echo ""

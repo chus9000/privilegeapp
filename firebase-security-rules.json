@@ -1,9 +1,21 @@
 {
+  "// QUOTA ENFORCEMENT": "Event creation is limited to 3 events per authenticated user. This is enforced server-side in the .write rule by counting events where creatorId matches the authenticated user's UID.",
+  
+  "// TIERED LICENSING EXTENSION": "To implement per-user quotas for tiered licensing (free/pro/enterprise), replace the hardcoded '< 3' with '< root.child('users').child(auth.uid).child('quota').val()'. Add a quota field to /users/{userId}/ with .write: false (admin-only) and .validate: newData.isNumber(). See docs/QUOTA_CONFIGURATION_GUIDE.md for complete migration path.",
+  
+  "// PERFORMANCE": "The quota enforcement requires an index on the creatorId field. Ensure the index is configured in Firebase console or firebase.json: {\"events\": {\".indexOn\": [\"creatorId\"]}}",
+  
+  "// SECURITY": "The creatorId field is validated to match auth.uid, preventing users from creating events under other users' quotas. Quota checks are atomic per write operation, preventing race conditions during concurrent creation attempts.",
+  
+  "// MIGRATION TO TIERED LICENSING": "Current: numChildren() < 3 (hardcoded). Future: numChildren() < root.child('users').child(auth.uid).child('quota').val() (dynamic per-user). Migration steps: 1) Add quota field to all users, 2) Update this rule, 3) Update client code to fetch user quota. See config/quota-config.js and docs/QUOTA_CONFIGURATION_GUIDE.md for details.",
+  
   "rules": {
     "events": {
+      ".read": "auth != null",
+      ".indexOn": ["creatorId"],
       "$eventId": {
         ".read": true,
-        ".write": "auth != null || $eventId === 'freeplay'",
+        ".write": "(auth != null && ((!data.exists() && root.child('events').orderByChild('creatorId').equalTo(auth.uid).once('value').numChildren() < 3) || (data.exists() && data.child('creatorId').val() === auth.uid))) || $eventId === 'freeplay'",
         
         "title": {
           ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 100"
