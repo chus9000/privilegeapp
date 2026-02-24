@@ -6,6 +6,18 @@ let allParticipants = [];
 let currentSearchTerm = '';
 let currentSort = { column: null, direction: 'asc' };
 
+/**
+ * Format a score with appropriate sign prefix
+ * Requirements: 1.2, 1.3, 1.4
+ * @param {number} score - The score to format
+ * @returns {string} "+N" for positive, "-N" for negative, "0" for zero
+ */
+function formatScore(score) {
+    if (score > 0) return `+${score}`;
+    if (score < 0) return `${score}`;
+    return '0';
+}
+
 // Load event data from Firebase or localStorage
 loadEventData();
 
@@ -190,6 +202,12 @@ function loadDetailedResults() {
     // Set page title
     document.getElementById('eventTitle').textContent = eventData.title + ' - Detailed Results';
     
+    // Set up "Back to Spectrum" button with event ID
+    const backToSpectrumBtn = document.getElementById('backToSpectrumBtn');
+    if (backToSpectrumBtn) {
+        backToSpectrumBtn.href = `results.html?id=${eventId}`;
+    }
+    
     // Store all participants for search functionality
     allParticipants = [...eventData.participants];
     
@@ -350,7 +368,7 @@ function buildTable() {
         // Score column
         const scoreCell = document.createElement('td');
         scoreCell.className = 'sticky-col score-cell';
-        scoreCell.innerHTML = `<span class="score-badge ${participant.score >= 0 ? 'positive' : 'negative'}">${participant.score > 0 ? '+' : ''}${participant.score}</span>`;
+        scoreCell.innerHTML = `<span class="score-badge ${participant.score >= 0 ? 'positive' : 'negative'}">${formatScore(participant.score)}</span>`;
         row.appendChild(scoreCell);
         
         // Calculate positive and negative sums

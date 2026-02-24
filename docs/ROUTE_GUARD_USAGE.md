@@ -18,8 +18,7 @@ The following routes require authentication:
 The following routes are accessible without authentication:
 - `/` - Landing Page
 - `/app/questions.html` - Questions Page (Free Play or Event)
-- `/app/results.html` - Results Page (Free Play or Event)
-- `/app/spectrum.html` - Spectrum Visualization
+- `/app/results.html` - Results Page and Spectrum Visualization (Free Play or Event)
 
 ## How to Use
 

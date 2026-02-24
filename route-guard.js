@@ -42,7 +42,7 @@ class RouteGuard {
     /**
      * Check if the current route requires authentication
      * Protected routes: /app, /app/create, /app/index.html, /app/create.html
-     * Public routes: /app/questions.html, /app/results.html, /app/spectrum.html
+     * Public routes: /app/questions.html, /app/results.html, /app/score.html
      * @returns {boolean} True if route requires authentication
      */
     isProtectedRoute() {
@@ -65,7 +65,7 @@ class RouteGuard {
     }
 
     /**
-     * Check if the route is a public app route (questions, results, spectrum)
+     * Check if the route is a public app route (questions, results, score)
      * @param {string} path - The path to check
      * @returns {boolean} True if route is public
      */
@@ -73,7 +73,7 @@ class RouteGuard {
         const publicRoutes = [
             '/app/questions.html',
             '/app/results.html',
-            '/app/spectrum.html'
+            '/app/score.html'
         ];
         
         return publicRoutes.some(route => path === route);
@@ -87,6 +87,7 @@ class RouteGuard {
         try {
             // Initialize if not already done
             if (!this.initialized) {
+                console.log('🛡️ RouteGuard not initialized, initializing...');
                 await this.initialize();
             }
 
@@ -97,6 +98,8 @@ class RouteGuard {
             }
 
             console.log('🛡️ Checking authentication for protected route...');
+            console.log('🔍 AuthManager.currentUser:', this.authManager.currentUser ? this.authManager.currentUser.email : 'NULL');
+            console.log('🔍 AuthManager.isAuthenticated():', this.authManager.isAuthenticated());
 
             // Check if user is authenticated
             if (!this.authManager.isAuthenticated()) {

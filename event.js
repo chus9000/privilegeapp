@@ -111,6 +111,8 @@ function setupPinEntry() {
     const savedParticipant = localStorage.getItem(`participant_${eventId}`);
     if (savedParticipant) {
         participant = JSON.parse(savedParticipant);
+        // Store session participant ID for score page access validation
+        storeSessionParticipant(eventId, participant.id);
         document.getElementById('pinContainer').style.display = 'none';
         document.getElementById('eventContent').style.display = 'block';
         loadEvent();
@@ -264,6 +266,9 @@ async function loadEvent() {
         }
     }
     
+    // Store session participant ID for score page access validation
+    storeSessionParticipant(eventId, participant.id);
+    
     // Hide participant card for free play mode (anonymous)
     if (isFreePlayMode) {
         const sidebar = document.querySelector('.sidebar');
@@ -319,7 +324,7 @@ async function loadEvent() {
     
     // Build results link with relative path
     const basePath = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/'));
-    document.getElementById('resultsLink').href = `./results.html?id=${eventId}`;
+    document.getElementById('resultsLink').href = `./score.html?id=${eventId}`;
     
     // Restore answers after questions are rendered
     restoreAnswers();
@@ -687,6 +692,29 @@ function generateUniqueId() {
     // Combine all entropy sources
     return `${timestamp}-${performanceTime}-${randomPart1}-${randomPart2}-${counter}`;
 }
+/**
+ * Store session participant ID in sessionStorage
+ * This allows the score page to verify the user is the session participant
+ * Requirements: 2.3, 2.4
+ * @param {string} eventId - The event ID
+ * @param {string} participantId - The participant ID
+ */
+function storeSessionParticipant(eventId, participantId) {
+    try {
+        sessionStorage.setItem(`participant_${eventId}`, participantId);
+        console.log('✅ Session participant stored:', participantId, 'for event:', eventId);
+    } catch (error) {
+        console.error('❌ Failed to store session participant:', error);
+        // Fallback to localStorage if sessionStorage is unavailable
+        try {
+            localStorage.setItem(`session_participant_${eventId}`, participantId);
+            console.log('✅ Session participant stored in localStorage (fallback)');
+        } catch (fallbackError) {
+            console.error('❌ Failed to store session participant in localStorage:', fallbackError);
+        }
+    }
+}
+
 
 /**
  * Show error notification to user
@@ -823,6 +851,11 @@ function openEmojiSelector() {
     });
     
     modal.style.display = 'block';
+    document.body.classList.add('modal-open');
+    
+    // Add click-outside-to-dismiss handler (remove any existing listener first)
+    modal.removeEventListener('click', handleEmojiModalClick);
+    modal.addEventListener('click', handleEmojiModalClick);
 }
 
 function selectEmoji(emoji) {
@@ -833,11 +866,17 @@ function selectEmoji(emoji) {
 }
 
 function closeEmojiSelector() {
-    document.getElementById('emojiModal').style.display = 'none';
+    const modal = document.getElementById('emojiModal');
+    modal.style.display = 'none';
+    document.body.classList.remove('modal-open');
+    // Remove click-outside handler when modal is closed
+    modal.removeEventListener('click', handleEmojiModalClick);
 }
 
-// Close modal when clicking outside
-window.onclick = function(event) {
+/**
+ * Handle click events on emoji modal (for click-outside-to-dismiss)
+ */
+function handleEmojiModalClick(event) {
     const modal = document.getElementById('emojiModal');
     if (event.target === modal) {
         closeEmojiSelector();

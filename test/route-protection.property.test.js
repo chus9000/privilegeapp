@@ -111,12 +111,13 @@ const protectedRouteGen = fc.constantFrom(
 
 /**
  * Generate public route paths
+ * Note: spectrum.html removed - redirects to results.html (spectrum-page-consolidation)
  */
 const publicRouteGen = fc.constantFrom(
   '/',
   '/app/questions.html',
   '/app/results.html',
-  '/app/spectrum.html'
+  '/app/score.html'
 );
 
 /**

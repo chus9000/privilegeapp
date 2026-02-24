@@ -19,15 +19,16 @@ describe('Event Details View', () => {
                 <div id="detailsEventTitle"></div>
                 <div id="detailsEventPin"></div>
                 <div id="detailsEventDate"></div>
-                <div id="detailsParticipantCount"></div>
+                <div id="detailsQuestionCount"></div>
+                <a id="detailsEventLink" href="#"></a>
+                <h3 id="detailsScoreStatsTitle">Score Statistics</h3>
                 <div id="detailsMeanScore"></div>
                 <div id="detailsMedianScore"></div>
                 <div id="detailsModeScore"></div>
                 <div id="detailsScoreRange"></div>
-                <div id="detailsParticipantsList"></div>
-                <div id="detailsNoParticipants" style="display: none;"></div>
                 <div id="eventDetailsModal" style="display: none;"></div>
                 <button id="viewSpectrumBtn"></button>
+                <button id="viewDetailedResultsBtn"></button>
             </body>
             </html>
         `);
@@ -256,127 +257,22 @@ describe('Event Details View', () => {
         });
     });
 
+    // Participants list display has been removed from the modal
+    // Tests for displayParticipantsList are no longer applicable
     describe('displayParticipantsList', () => {
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-        
-        function displayParticipantsList(participants) {
-            const listContainer = document.getElementById('detailsParticipantsList');
-            listContainer.innerHTML = '';
-            
-            const sortedParticipants = [...participants].sort((a, b) => b.score - a.score);
-            
-            sortedParticipants.forEach((participant, index) => {
-                const participantItem = document.createElement('div');
-                participantItem.className = 'participant-item';
-                
-                const scoreValue = participant.score > 0 ? `+${participant.score}` : participant.score.toString();
-                const rank = index + 1;
-                
-                participantItem.innerHTML = `
-                    <div class="participant-rank">#${rank}</div>
-                    <div class="participant-avatar">${participant.avatar}</div>
-                    <div class="participant-info">
-                        <div class="participant-name">${escapeHtml(participant.name)}</div>
-                        <div class="participant-score">Score: ${scoreValue}</div>
-                    </div>
-                `;
-                
-                listContainer.appendChild(participantItem);
-            });
-        }
-        
-        it('should display participants sorted by score (highest first)', () => {
-            const participants = [
-                { id: 'p1', name: 'Alice', avatar: '🐱', score: 5 },
-                { id: 'p2', name: 'Bob', avatar: '🐶', score: 15 },
-                { id: 'p3', name: 'Charlie', avatar: '🦊', score: 10 }
-            ];
-            
-            displayParticipantsList(participants);
-            
-            const listContainer = document.getElementById('detailsParticipantsList');
-            const items = listContainer.querySelectorAll('.participant-item');
-            
-            expect(items.length).toBe(3);
-            expect(items[0].querySelector('.participant-name').textContent).toBe('Bob');
-            expect(items[1].querySelector('.participant-name').textContent).toBe('Charlie');
-            expect(items[2].querySelector('.participant-name').textContent).toBe('Alice');
-        });
-        
-        it('should display correct rank numbers', () => {
-            const participants = [
-                { id: 'p1', name: 'Alice', avatar: '🐱', score: 10 },
-                { id: 'p2', name: 'Bob', avatar: '🐶', score: 5 }
-            ];
-            
-            displayParticipantsList(participants);
-            
-            const listContainer = document.getElementById('detailsParticipantsList');
-            const ranks = listContainer.querySelectorAll('.participant-rank');
-            
-            expect(ranks[0].textContent).toBe('#1');
-            expect(ranks[1].textContent).toBe('#2');
-        });
-
-        it('should format positive scores with + sign', () => {
-            const participants = [
-                { id: 'p1', name: 'Alice', avatar: '🐱', score: 10 }
-            ];
-            
-            displayParticipantsList(participants);
-            
-            const listContainer = document.getElementById('detailsParticipantsList');
-            const scoreElement = listContainer.querySelector('.participant-score');
-            
-            expect(scoreElement.textContent).toBe('Score: +10');
-        });
-        
-        it('should format negative scores without extra sign', () => {
-            const participants = [
-                { id: 'p1', name: 'Alice', avatar: '🐱', score: -5 }
-            ];
-            
-            displayParticipantsList(participants);
-            
-            const listContainer = document.getElementById('detailsParticipantsList');
-            const scoreElement = listContainer.querySelector('.participant-score');
-            
-            expect(scoreElement.textContent).toBe('Score: -5');
-        });
-        
-        it('should display avatars correctly', () => {
-            const participants = [
-                { id: 'p1', name: 'Alice', avatar: '🐱', score: 10 }
-            ];
-            
-            displayParticipantsList(participants);
-            
-            const listContainer = document.getElementById('detailsParticipantsList');
-            const avatar = listContainer.querySelector('.participant-avatar');
-            
-            expect(avatar.textContent).toBe('🐱');
-        });
-        
-        it('should handle empty participants array', () => {
-            displayParticipantsList([]);
-            
-            const listContainer = document.getElementById('detailsParticipantsList');
-            const items = listContainer.querySelectorAll('.participant-item');
-            
-            expect(items.length).toBe(0);
+        it('should be removed from event details modal', () => {
+            // This functionality has been removed as participants are no longer displayed in the modal
+            expect(true).toBe(true);
         });
     });
     
     describe('Event Details Modal Display', () => {
-        it('should show participant count', () => {
+        it('should show participant count in statistics title', () => {
             const participantCount = 5;
-            document.getElementById('detailsParticipantCount').textContent = participantCount;
+            const statsTitle = document.getElementById('detailsScoreStatsTitle');
+            statsTitle.textContent = `Score Statistics for ${participantCount} participants`;
             
-            expect(document.getElementById('detailsParticipantCount').textContent).toBe('5');
+            expect(statsTitle.textContent).toBe('Score Statistics for 5 participants');
         });
         
         it('should show event title and PIN', () => {

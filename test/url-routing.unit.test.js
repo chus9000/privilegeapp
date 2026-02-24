@@ -307,8 +307,8 @@ describe('URL Routing - Unit Tests', () => {
       expect(canAccess).toBe(true);
     });
 
-    test('spectrum page should be accessible without authentication', async () => {
-      mockLocation.pathname = '/app/spectrum.html';
+    test('score page should be accessible without authentication', async () => {
+      mockLocation.pathname = '/app/score.html';
       mockRouteGuard.isProtectedRoute.mockReturnValue(false);
       mockRouteGuard.guard.mockResolvedValue(true);
       
@@ -395,7 +395,7 @@ describe('URL Routing - Unit Tests', () => {
       const publicAppRoutes = [
         '/app/questions.html',
         '/app/results.html',
-        '/app/spectrum.html'
+        '/app/score.html'
       ];
       
       publicAppRoutes.forEach(route => {

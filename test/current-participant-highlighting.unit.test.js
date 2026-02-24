@@ -35,7 +35,7 @@ describe('Current Participant Highlighting', () => {
         `;
 
         dom = new JSDOM(html, {
-            url: 'http://localhost/app/spectrum.html?id=test-event',
+            url: 'http://localhost/app/results.html?id=test-event',
             runScripts: 'dangerously',
             resources: 'usable'
         });

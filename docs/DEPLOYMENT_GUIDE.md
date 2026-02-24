@@ -49,6 +49,8 @@ You have two options to deploy security rules:
 3. Paste into the rules editor
 4. Click "Publish"
 
+**Important**: The security rules include an index configuration for the `creatorId` field. This index is automatically deployed when you publish the rules and is required for the event creation quota feature to perform efficiently.
+
 #### Option B: Using Firebase CLI (Recommended)
 
 ```bash
@@ -66,9 +68,30 @@ firebase init
 # - Use existing project: privilegespectrum
 # - Database rules file: firebase-security-rules.json
 
-# Deploy rules
+# Deploy rules (this also deploys the index configuration)
 firebase deploy --only database
 ```
+
+**Note**: The `firebase-security-rules.json` file includes an `.indexOn` directive for the `creatorId` field under the `events` node. This index is essential for the event creation quota enforcement feature to work efficiently. When you deploy the rules, Firebase automatically creates this index.
+
+### Step 4.1: Verify Index Configuration
+
+After deploying the security rules, verify that the index is active:
+
+1. In Firebase Console, go to **Realtime Database**
+2. Click on the **Rules** tab
+3. Look for the `.indexOn` directive under the `events` node:
+   ```json
+   "events": {
+     ".read": "auth != null",
+     ".indexOn": ["creatorId"],
+     ...
+   }
+   ```
+4. If you see a warning about missing indexes in the Firebase Console logs, the index may not have been deployed correctly
+5. You can also check the **Usage** tab to see if queries are using indexes efficiently
+
+**Performance Note**: Without this index, queries that count events by `creatorId` would be slow and could fail for large datasets. The index ensures O(log n) query performance.
 
 ### Step 5: Get Firebase Configuration
 

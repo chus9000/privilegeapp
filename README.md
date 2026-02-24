@@ -96,8 +96,7 @@ privilege-spectrum-app/
 │   ├── dashboard.js       # User dashboard
 │   ├── event.html         # Event management
 │   ├── questions.html     # Participant quiz
-│   ├── results.html       # Results visualization
-│   └── spectrum.html      # Spectrum view
+│   └── results.html       # Results and spectrum visualization
 ├── test/                  # Test suite
 ├── docs/                  # Documentation
 ├── firebase-config.js     # Firebase configuration
@@ -172,7 +171,7 @@ firebase emulators:start
 2. **Create Event** from dashboard
 3. **Share** the questions URL and PIN with participants
 4. **Monitor** results in real-time
-5. **View Spectrum** to see participant positioning
+5. **View Results** to see participant positioning and spectrum
 
 ### For Participants
 

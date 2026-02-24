@@ -45,43 +45,14 @@ function onFreePlayClick() {
 
 /**
  * Handle "Create Event" button click
- * Trigger Google sign-in
+ * Navigate directly to /app/ page
  * Requirement: 1.4
  */
 async function onCreateEventClick() {
-    console.log('🎪 Create Event mode selected');
-    
-    try {
-        // Show loading state
-        const createEventBtn = document.getElementById('createEventBtn');
-        const originalText = createEventBtn.textContent;
-        createEventBtn.textContent = 'Signing in...';
-        createEventBtn.disabled = true;
-        
-        // Trigger Google sign-in
-        const user = await window.AuthManager.signInWithGoogle();
-        
-        if (user) {
-            console.log('✅ Authentication successful, navigating to dashboard');
-            // Navigate to event dashboard
-            window.location.href = './app/';
-        } else {
-            console.log('⚠️ Authentication cancelled by user');
-            // Restore button state
-            createEventBtn.textContent = originalText;
-            createEventBtn.disabled = false;
-        }
-    } catch (error) {
-        console.error('❌ Authentication error:', error);
-        
-        // Show error message
-        alert(error.message || 'Authentication failed. Please try again.');
-        
-        // Restore button state
-        const createEventBtn = document.getElementById('createEventBtn');
-        createEventBtn.textContent = 'Sign in with Google';
-        createEventBtn.disabled = false;
-    }
+    console.log('🎪 Create Event mode selected - navigating to app');
+    // Simply navigate to the app page
+    // The app page will handle authentication
+    window.location.href = './app/';
 }
 
 /**

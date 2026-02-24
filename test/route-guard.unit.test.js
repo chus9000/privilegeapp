@@ -92,7 +92,7 @@ describe('RouteGuard - Unit Tests', () => {
                 const publicRoutes = [
                     '/app/questions.html',
                     '/app/results.html',
-                    '/app/spectrum.html'
+                    '/app/score.html'
                 ];
                 return publicRoutes.some(route => path === route);
             }
@@ -188,9 +188,15 @@ describe('RouteGuard - Unit Tests', () => {
             expect(routeGuard.isProtectedRoute()).toBe(false);
         });
 
-        it('should identify /app/spectrum.html as public route', () => {
-            window.location.pathname = '/app/spectrum.html';
+        it('should identify /app/score.html as public route', () => {
+            window.location.pathname = '/app/score.html';
             expect(routeGuard.isProtectedRoute()).toBe(false);
+        });
+
+        it('should NOT identify /app/spectrum.html as public route', () => {
+            // Requirement 5.3: spectrum.html removed from public routes after consolidation
+            window.location.pathname = '/app/spectrum.html';
+            expect(routeGuard.isProtectedRoute()).toBe(true);
         });
     });
 
@@ -277,8 +283,8 @@ describe('RouteGuard - Unit Tests', () => {
             expect(result).toBe(true);
         });
 
-        it('should allow access to /app/spectrum.html without authentication', async () => {
-            window.location.pathname = '/app/spectrum.html';
+        it('should allow access to /app/score.html without authentication', async () => {
+            window.location.pathname = '/app/score.html';
             const result = await routeGuard.guard();
             expect(result).toBe(true);
         });
