@@ -500,6 +500,220 @@ function renderAllyTips(score, min, max) {
 }
 
 /**
+ * Render score distribution histogram
+ * @param {string} eventId - Event ID
+ * @param {number} userScore - User's score
+ */
+async function renderScoreDistribution(eventId, userScore) {
+    console.log('[Score] Rendering score distribution');
+    
+    try {
+        const container = document.getElementById('scoreDistributionContainer');
+        if (!container) {
+            console.error('[Score] Score distribution container not found');
+            return;
+        }
+        
+        // Load responses to calculate distribution
+        let responses = [];
+        if (eventId === 'freeplay') {
+            if (typeof loadFreePlayResponses !== 'undefined') {
+                responses = await loadFreePlayResponses();
+            }
+        } else {
+            const eventData = await window.FirebaseAPI.loadEvent(eventId);
+            if (eventData && eventData.participants) {
+                responses = eventData.participants;
+            }
+        }
+        
+        if (!responses || responses.length === 0) {
+            console.log('[Score] No responses available for distribution');
+            return;
+        }
+        
+        // Calculate distribution
+        const scores = responses.map(r => r.score);
+        const scoreFrequency = {};
+        scores.forEach(score => {
+            scoreFrequency[score] = (scoreFrequency[score] || 0) + 1;
+        });
+        
+        const distribution = Object.entries(scoreFrequency)
+            .map(([score, count]) => ({ score: parseInt(score), count }))
+            .sort((a, b) => a.score - b.score);
+        
+        // Find max count for scaling
+        const maxCount = Math.max(...distribution.map(d => d.count));
+        
+        // Format score with sign
+        const formatScore = (score) => {
+            if (score > 0) return `+${score}`;
+            if (score < 0) return `${score}`;
+            return '0';
+        };
+        
+        // Create histogram bars
+        const histogramHTML = distribution.map(({ score, count }) => {
+            const heightPercent = (count / maxCount) * 100;
+            const isUserScore = score === userScore;
+            
+            return `
+                <div class="histogram-bar-container">
+                    <div class="histogram-bar ${isUserScore ? 'user-score' : ''}" 
+                         style="height: ${heightPercent}%"
+                         title="${count} participant${count !== 1 ? 's' : ''} scored ${score}">
+                        <span class="bar-count">${count}</span>
+                    </div>
+                    <div class="histogram-label ${isUserScore ? 'user-score-label' : ''}">${formatScore(score)}</div>
+                    ${isUserScore ? '<div class="user-indicator">You</div>' : ''}
+                </div>
+            `;
+        }).join('');
+        
+        container.innerHTML = `
+            <div class="analytics-section score-distribution">
+                <h2>Score Distribution</h2>
+                <div class="histogram-chart">${histogramHTML}</div>
+            </div>
+        `;
+        
+        console.log('[Score] Score distribution rendered successfully');
+        
+    } catch (error) {
+        console.error('[Score] Error rendering score distribution:', error);
+        // Silently fail - this is supplementary
+    }
+}
+
+/**
+ * Render question-by-question comparison
+ * @param {string} eventId - Event ID
+ * @param {Object|Array} userAnswers - User's answers
+ */
+async function renderQuestionComparison(eventId, userAnswers) {
+    console.log('[Score] Rendering question comparison');
+    
+    try {
+        const container = document.getElementById('questionComparisonContainer');
+        if (!container) {
+            console.error('[Score] Question comparison container not found');
+            return;
+        }
+        
+        // Load responses to calculate question stats
+        let responses = [];
+        if (eventId === 'freeplay') {
+            if (typeof loadFreePlayResponses !== 'undefined') {
+                responses = await loadFreePlayResponses();
+            }
+        } else {
+            const eventData = await window.FirebaseAPI.loadEvent(eventId);
+            if (eventData && eventData.participants) {
+                responses = eventData.participants;
+            }
+        }
+        
+        if (!responses || responses.length === 0) {
+            console.log('[Score] No responses available for question comparison');
+            return;
+        }
+        
+        // Calculate question statistics
+        const questionStats = [];
+        questions.forEach((question, index) => {
+            let yesCount = 0;
+            let noCount = 0;
+            
+            responses.forEach(response => {
+                if (!response.answers) return;
+                
+                let answer;
+                if (Array.isArray(response.answers)) {
+                    answer = response.answers[index];
+                } else {
+                    answer = response.answers[index.toString()] || response.answers[index];
+                }
+                
+                if (answer === 1) {
+                    yesCount++;
+                } else if (answer === 0) {
+                    noCount++;
+                }
+            });
+            
+            const answeredCount = yesCount + noCount;
+            const yesPercentage = answeredCount > 0 ? Math.round((yesCount / answeredCount) * 100) : 0;
+            const noPercentage = answeredCount > 0 ? Math.round((noCount / answeredCount) * 100) : 0;
+            
+            questionStats.push({
+                questionIndex: index,
+                questionText: question.text,
+                questionValue: question.value,
+                yesPercentage,
+                noPercentage
+            });
+        });
+        
+        // Render each question's statistics
+        const questionsHTML = questionStats.map(stat => {
+            // Get user's answer for this question
+            let userAnswer;
+            if (Array.isArray(userAnswers)) {
+                userAnswer = userAnswers[stat.questionIndex];
+            } else {
+                userAnswer = userAnswers[stat.questionIndex.toString()] || userAnswers[stat.questionIndex];
+            }
+            
+            const userAnsweredYes = userAnswer === 1;
+            const userAnsweredNo = userAnswer === 0;
+            
+            return `
+                <div class="question-stat-card">
+                    <div class="question-text">${stat.questionText}</div>
+                    <div class="question-value">Point value: ${stat.questionValue > 0 ? '+' : ''}${stat.questionValue}</div>
+                    <div class="answer-distribution">
+                        <div class="answer-bar-container">
+                            <div class="answer-label ${userAnsweredYes ? 'user-answer' : ''}">
+                                Yes ${userAnsweredYes ? '(You)' : ''}
+                            </div>
+                            <div class="answer-bar-wrapper">
+                                <div class="answer-bar yes-bar" style="width: ${stat.yesPercentage}%">
+                                    <span class="answer-percentage">${stat.yesPercentage}%</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="answer-bar-container">
+                            <div class="answer-label ${userAnsweredNo ? 'user-answer' : ''}">
+                                No ${userAnsweredNo ? '(You)' : ''}
+                            </div>
+                            <div class="answer-bar-wrapper">
+                                <div class="answer-bar no-bar" style="width: ${stat.noPercentage}%">
+                                    <span class="answer-percentage">${stat.noPercentage}%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+        
+        container.innerHTML = `
+            <div class="analytics-section question-comparison">
+                <h2>Question-by-Question Comparison</h2>
+                <div class="question-stats-container">${questionsHTML}</div>
+            </div>
+        `;
+        
+        console.log('[Score] Question comparison rendered successfully');
+        
+    } catch (error) {
+        console.error('[Score] Error rendering question comparison:', error);
+        // Silently fail - this is supplementary
+    }
+}
+
+/**
  * Setup navigation button handlers
  * Requirements: 4.2, 4.3, 4.5
  * @param {string} eventId - Event ID
@@ -592,6 +806,12 @@ async function initialize() {
         
         // Render ally tips (handles errors internally)
         renderAllyTips(participant.score, spectrumConfig.min, spectrumConfig.max);
+        
+        // Render score distribution (handles errors internally)
+        await renderScoreDistribution(eventId, participant.score);
+        
+        // Render question comparison (handles errors internally)
+        await renderQuestionComparison(eventId, participant.answers);
         
         // Setup navigation
         setupNavigation(eventId);
