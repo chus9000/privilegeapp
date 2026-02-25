@@ -197,3 +197,11 @@ if (typeof module !== 'undefined' && module.exports) {
         calculateQuestionStats
     };
 }
+
+// Also expose globally for browser use
+if (typeof window !== 'undefined') {
+    window.loadFreePlayResponses = loadFreePlayResponses;
+    window.calculateScoreStats = calculateScoreStats;
+    window.calculatePercentile = calculatePercentile;
+    window.calculateQuestionStats = calculateQuestionStats;
+}
