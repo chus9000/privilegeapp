@@ -232,8 +232,20 @@ async function getAnalyticsData(eventId, userScore) {
         if (eventId === 'freeplay') {
             console.log('[Score] Free play mode - loading aggregate analytics');
             
-            // Import free-play analytics module
-            const { loadFreePlayResponses, calculateScoreStats, calculatePercentile } = await import('../free-play-analytics.js');
+            // Check if free-play analytics functions are available
+            if (typeof loadFreePlayResponses === 'undefined') {
+                console.error('[Score] Free-play analytics module not loaded');
+                return {
+                    stats: {
+                        mean: userScore,
+                        median: userScore,
+                        mode: userScore
+                    },
+                    percentile: 50,
+                    totalParticipants: 1,
+                    lessPrivilegedCount: 0
+                };
+            }
             
             // Load all freeplay responses
             const responses = await loadFreePlayResponses();
