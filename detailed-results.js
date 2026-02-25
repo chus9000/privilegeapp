@@ -315,7 +315,6 @@ function buildTable() {
         th.setAttribute('data-column', `question-${questionIndex}`);
         th.innerHTML = `
             <div class="question-header">
-                <div class="question-number">Q${questionIndex + 1}</div>
                 <div class="question-text" title="${question.text}">
                     ${question.text.length > 120 ? question.text.substring(0, 120) + '...' : question.text}
                 </div>

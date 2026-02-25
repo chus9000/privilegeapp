@@ -594,6 +594,17 @@ input[type="radio"] {
     align-items: center;
 }
 
+.archive-btn {
+    /* DEPRECATED: Use .btn .btn-sm instead */
+    padding: 8px 16px;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: inherit;
+}
 
 .open-btn {
     background: #667eea;
@@ -806,6 +817,19 @@ input[type="radio"] {
     min-width: 120px;
 }
 
+.cancel-btn {
+    /* DEPRECATED: Use .btn .btn-secondary instead */
+    background: #f8fafc;
+    color: #475569;
+    border: 2px solid #e2e8f0;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: none;
+}
 
 .cancel-btn:hover {
     background: #f1f5f9;
@@ -814,6 +838,19 @@ input[type="radio"] {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
+.save-btn {
+    /* DEPRECATED: Use .btn .btn-primary instead */
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 14px 0 rgba(102, 126, 234, 0.3);
+}
 
 .save-btn:hover {
     transform: translateY(-2px);
@@ -2758,7 +2795,7 @@ body:has(.search-container[style*="display: block"]) .participant-marker:not(.fi
 }
 
 .question-text {
-    font-size: 0.6rem;
+    font-size: 0.65rem;
     color: #64748b;
     line-height: 1.3;
     max-height: 5.2em; /* Approximately 6 lines with line-height 1.3 */
@@ -2767,13 +2804,7 @@ body:has(.search-container[style*="display: block"]) .participant-marker:not(.fi
     overflow: hidden;
     display: -webkit-box;
     -webkit-line-clamp: 6;
-    line-clamp: 6;
     -webkit-box-orient: vertical;
-}
-
-/* More specific selector for detailed results table question text */
-.detailed-results-table .question-header .question-text {
-    font-size: 0.6rem !important;
 }
 
 /* Avatar styling in table */
@@ -3811,12 +3842,38 @@ section {
     gap: 12px;
 }
 
+.primary-btn {
+    /* DEPRECATED: Use .btn .btn-primary instead */
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 14px rgba(102, 126, 234, 0.3);
+}
 
 .primary-btn:hover {
     transform: translateY(-2px);
     box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
 }
 
+.secondary-btn {
+    /* DEPRECATED: Use .btn .btn-secondary instead */
+    background: white;
+    color: #667eea;
+    border: 2px solid #667eea;
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
 
 .secondary-btn:hover {
     background: #667eea;
@@ -5346,6 +5403,12 @@ section {
     }
 }
 
+    .share-quiz-btn {
+        padding: 12px 24px;
+        font-size: 0.95rem;
+    }
+}
+
 /* Event Details Modal Styles */
 .event-details-modal {
     max-width: 900px;
@@ -6156,12 +6219,10 @@ section {
     line-height: 1.6;
     margin-bottom: 16px;
     /* Reset table-specific overrides */
-    max-width: none;
     max-height: none;
     overflow: visible;
     display: block;
     -webkit-line-clamp: unset;
-    line-clamp: unset;
     -webkit-box-orient: unset;
 }
 
