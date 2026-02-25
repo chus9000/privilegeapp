@@ -14,12 +14,14 @@ global.questions = [
     { text: "Question 5", value: 1 }
 ];
 
-// Mock Firebase API
+// Mock Firebase config and fetch
 global.window = {
-    FirebaseAPI: {
-        loadEvent: vi.fn()
+    FIREBASE_CONFIG: {
+        databaseURL: 'https://test-db.firebaseio.com'
     }
 };
+
+global.fetch = vi.fn();
 
 // Import the module functions
 const {
@@ -36,24 +38,28 @@ describe('Free Play Analytics', () => {
         });
 
         it('should load free play responses from Firebase', async () => {
-            const mockResponses = [
-                { id: '1', score: 5, answers: { 0: 1, 1: 0, 2: 1, 3: 0, 4: 1 } },
-                { id: '2', score: -3, answers: { 0: 0, 1: 1, 2: 0, 3: 1, 4: 0 } }
-            ];
+            const mockResponses = {
+                'id1': { id: '1', score: 5, answers: { 0: 1, 1: 0, 2: 1, 3: 0, 4: 1 } },
+                'id2': { id: '2', score: -3, answers: { 0: 0, 1: 1, 2: 0, 3: 1, 4: 0 } }
+            };
 
-            window.FirebaseAPI.loadEvent.mockResolvedValue({
-                participants: mockResponses
+            global.fetch.mockResolvedValue({
+                ok: true,
+                json: async () => mockResponses
             });
 
             const result = await loadFreePlayResponses();
 
-            expect(window.FirebaseAPI.loadEvent).toHaveBeenCalledWith('freeplay');
-            expect(result).toEqual(mockResponses);
+            expect(global.fetch).toHaveBeenCalledWith('https://test-db.firebaseio.com/events/freeplay/participants.json');
+            expect(result).toEqual(Object.values(mockResponses));
             expect(result.length).toBe(2);
         });
 
         it('should return empty array when no responses found', async () => {
-            window.FirebaseAPI.loadEvent.mockResolvedValue(null);
+            global.fetch.mockResolvedValue({
+                ok: true,
+                json: async () => null
+            });
 
             const result = await loadFreePlayResponses();
 
@@ -61,7 +67,10 @@ describe('Free Play Analytics', () => {
         });
 
         it('should return empty array when participants is undefined', async () => {
-            window.FirebaseAPI.loadEvent.mockResolvedValue({});
+            global.fetch.mockResolvedValue({
+                ok: true,
+                json: async () => null
+            });
 
             const result = await loadFreePlayResponses();
 
@@ -69,7 +78,7 @@ describe('Free Play Analytics', () => {
         });
 
         it('should handle Firebase errors gracefully', async () => {
-            window.FirebaseAPI.loadEvent.mockRejectedValue(new Error('Firebase error'));
+            global.fetch.mockRejectedValue(new Error('Firebase error'));
 
             const result = await loadFreePlayResponses();
 
