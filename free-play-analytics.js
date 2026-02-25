@@ -16,21 +16,34 @@ async function loadFreePlayResponses() {
     try {
         console.log('[Analytics] Loading free play responses from Firebase...');
         
-        // Load the freeplay event data
-        const freeplayData = await window.FirebaseAPI.loadEvent('freeplay');
+        // Load the freeplay participants directly from Firebase
+        // Data is stored as: /events/freeplay/participants/{participantId}
+        const url = `${window.FIREBASE_CONFIG.databaseURL}/events/freeplay/participants.json`;
         
-        if (!freeplayData || !freeplayData.participants) {
+        const response = await fetch(url);
+        
+        if (!response.ok) {
+            console.error('❌ Failed to load freeplay responses:', response.status, response.statusText);
+            return [];
+        }
+        
+        const participantsObject = await response.json();
+        
+        if (!participantsObject) {
             console.log('⚠️ No free play responses found');
             return [];
         }
         
-        console.log(`✅ Loaded ${freeplayData.participants.length} free play responses`);
-        return freeplayData.participants;
+        // Convert object of participants to array
+        const participantsArray = Object.values(participantsObject);
+        
+        console.log(`✅ Loaded ${participantsArray.length} free play responses`);
+        return participantsArray;
         
     } catch (error) {
         // Requirements: 15.5 - Log Firebase errors to console for debugging
         console.error('❌ Firebase operation failed: loadFreePlayResponses', {
-            operation: 'loadEvent',
+            operation: 'fetch',
             eventId: 'freeplay',
             error: error.message,
             errorCode: error.code,
