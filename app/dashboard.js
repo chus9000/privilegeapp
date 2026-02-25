@@ -45,6 +45,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                 dashboardHeader.style.display = 'flex';
             }
             
+            // Show Create New Event button in header
+            const createNewEventBtnHeader = document.getElementById('createNewEventBtnHeader');
+            if (createNewEventBtnHeader) {
+                createNewEventBtnHeader.style.display = 'inline-block';
+            }
+            
             // Load user's events
             loadEvents();
             
@@ -72,6 +78,12 @@ function showSignInUI() {
     const dashboardHeader = document.querySelector('.dashboard-header');
     if (dashboardHeader) {
         dashboardHeader.style.display = 'none';
+    }
+    
+    // Hide Create New Event button in header
+    const createNewEventBtnHeader = document.getElementById('createNewEventBtnHeader');
+    if (createNewEventBtnHeader) {
+        createNewEventBtnHeader.style.display = 'none';
     }
     
     document.getElementById('eventsContainer').style.display = 'none';

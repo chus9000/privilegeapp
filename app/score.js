@@ -228,18 +228,47 @@ async function getAnalyticsData(eventId, userScore) {
     console.log('[Score] Getting analytics data for event:', eventId);
     
     try {
-        // Handle free play mode - show basic stats
+        // Handle free play mode - load all freeplay responses for aggregate analytics
         if (eventId === 'freeplay') {
-            console.log('[Score] Free play mode - showing basic stats');
+            console.log('[Score] Free play mode - loading aggregate analytics');
+            
+            // Import free-play analytics module
+            const { loadFreePlayResponses, calculateScoreStats, calculatePercentile } = await import('../free-play-analytics.js');
+            
+            // Load all freeplay responses
+            const responses = await loadFreePlayResponses();
+            
+            if (!responses || responses.length === 0) {
+                console.log('[Score] No freeplay responses found - showing basic stats');
+                return {
+                    stats: {
+                        mean: userScore,
+                        median: userScore,
+                        mode: userScore
+                    },
+                    percentile: 50,
+                    totalParticipants: 1,
+                    lessPrivilegedCount: 0
+                };
+            }
+            
+            // Calculate aggregate statistics
+            const stats = calculateScoreStats(responses);
+            const allScores = responses.map(r => r.score);
+            const percentile = calculatePercentile(userScore, allScores);
+            const lessPrivilegedCount = allScores.filter(s => s < userScore).length;
+            
+            console.log('[Score] Freeplay analytics calculated:', {
+                totalParticipants: responses.length,
+                stats,
+                percentile
+            });
+            
             return {
-                stats: {
-                    mean: userScore,
-                    median: userScore,
-                    mode: userScore
-                },
-                percentile: 50,
-                totalParticipants: 1,
-                lessPrivilegedCount: 0
+                stats,
+                percentile,
+                totalParticipants: responses.length,
+                lessPrivilegedCount
             };
         }
         
