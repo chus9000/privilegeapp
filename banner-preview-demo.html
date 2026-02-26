@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Banner Preview - DO NOT COMMIT</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f8fafc;
+            padding: 40px 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .preview-label {
+            background: #dc2626;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            margin-bottom: 40px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+        }
+
+        .content-wrapper {
+            max-width: 900px;
+            width: 100%;
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .mock-content {
+            margin-bottom: 40px;
+            padding: 30px;
+            background: #f1f5f9;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .mock-content h2 {
+            color: #1e293b;
+            margin-bottom: 12px;
+        }
+
+        .mock-content p {
+            color: #64748b;
+            line-height: 1.6;
+        }
+
+        /* The actual banner styles */
+        .create-own-banner {
+            margin: 60px auto 40px;
+            max-width: 800px;
+            padding: 40px 32px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 16px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+
+        .create-own-banner .banner-content h3 {
+            color: #ffffff;
+            font-size: 28px;
+            font-weight: 700;
+            margin: 0 0 12px 0;
+        }
+
+        .create-own-banner .banner-content p {
+            color: rgba(255, 255, 255, 0.95);
+            font-size: 16px;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        .create-own-banner .btn {
+            display: inline-block;
+            background: #ffffff;
+            color: #667eea;
+            font-weight: 600;
+            padding: 14px 32px;
+            border-radius: 8px;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .create-own-banner .btn:hover {
+            background: #f8fafc;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .footer {
+            margin-top: auto;
+            padding: 40px 20px 0px;
+            text-align: center;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .footer-content {
+            color: #64748b;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .footer-content div:first-child {
+            margin-bottom: 4px;
+        }
+
+        .footer-content a {
+            color: inherit;
+            text-decoration: underline;
+        }
+
+        .footer-content a:hover {
+            opacity: 0.8;
+        }
+
+        @media (max-width: 640px) {
+            .create-own-banner {
+                padding: 32px 24px;
+            }
+
+            .create-own-banner .banner-content h3 {
+                font-size: 24px;
+            }
+
+            .create-own-banner .banner-content p {
+                font-size: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="preview-label">
+        ⚠️ DEMO PREVIEW - DO NOT COMMIT TO GITHUB
+    </div>
+
+    <div class="content-wrapper">
+        <!-- Mock score page content -->
+        <div class="mock-content">
+            <h2>Your Score: 65/100</h2>
+            <p>This is where the user's results would appear...</p>
+            <p style="margin-top: 12px; color: #94a3b8;">
+                (Imagine debrief content, ally tips, and score distribution here)
+            </p>
+        </div>
+
+        <!-- The actual banner -->
+        <div class="create-own-banner">
+            <div class="banner-content">
+                <h3>Enjoyed this experience?</h3>
+                <p>Create your own customized version for free! Perfect for events, workshops, or team building.</p>
+                <a href="#" class="btn btn-primary" style="margin-top: 16px;">Create Your Own Event</a>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-content">
+                <div>© 2025-2026 Privilege Spectrum. All rights reserved.</div>
+                <div>Any feedback? reach out to <a href="mailto:hi@jesusmartin.eu">hi@jesusmartin.eu</a> | <a href="/privacy.html">Privacy</a> | <a href="/terms.html">Terms</a></div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Prevent accidental navigation
+        document.querySelector('.btn').addEventListener('click', (e) => {
+            e.preventDefault();
+            alert('This is a demo preview. The button would navigate to the event creation page.');
+        });
+    </script>
+</body>
+</html>

@@ -865,6 +865,45 @@ input[type="radio"] {
     transform: scale(0.98);
 }
 
+/* Create Your Own Banner */
+.create-own-banner {
+    margin: 60px auto 40px;
+    max-width: 800px;
+    padding: 40px 32px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 16px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+}
+
+.create-own-banner .banner-content h3 {
+    color: #ffffff;
+    font-size: 28px;
+    font-weight: 700;
+    margin: 0 0 12px 0;
+}
+
+.create-own-banner .banner-content p {
+    color: rgba(255, 255, 255, 0.95);
+    font-size: 16px;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.create-own-banner .btn {
+    display: inline-block;
+    background: #ffffff;
+    color: #667eea;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.create-own-banner .btn:hover {
+    background: #f8fafc;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
 .footer {
     margin-top: auto;
     padding: 40px 20px 0px;
@@ -2339,7 +2378,6 @@ body:has(.search-container[style*="display: block"]) .participant-marker:not(.fi
     display: flex;
     gap: 16px;
     align-items: center;
-    min-width: 200px;
 }
 
 .stat-group {
@@ -2471,6 +2509,22 @@ body:has(.search-container[style*="display: block"]) .participant-marker:not(.fi
     
     .stat-group {
         min-width: 70px;
+    }
+}
+
+/* Extra small mobile devices */
+@media (max-width: 480px) {
+    .stat-group {
+        min-width: 60px;
+        padding: 6px 8px;
+    }
+    
+    .stat-label {
+        font-size: 0.7rem;
+    }
+    
+    .stat-percentage {
+        font-size: 1rem;
     }
 }
 
@@ -2757,7 +2811,7 @@ body:has(.search-container[style*="display: block"]) .participant-marker:not(.fi
     border-radius: 4px;
 }
 
-.question-text {
+.detailed-results-table .question-text {
     font-size: 0.6rem;
     color: #64748b;
     line-height: 1.3;
@@ -2998,7 +3052,7 @@ body:has(.search-container[style*="display: block"]) .participant-marker:not(.fi
         max-width: 100px;
     }
     
-    .question-text {
+    .detailed-results-table .question-text {
         font-size: 0.6rem;
         max-width: 80px;
     }
@@ -3042,7 +3096,7 @@ body:has(.search-container[style*="display: block"]) .participant-marker:not(.fi
         gap: 2px;
     }
     
-    .question-text {
+    .detailed-results-table .question-text {
         font-size: 0.55rem;
         max-width: 60px;
     }
@@ -4960,6 +5014,8 @@ section {
     color: #1e293b;
     margin-bottom: 8px;
     line-height: 1.5;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
 }
 
 .question-value {
@@ -5071,11 +5127,11 @@ section {
 /* Mobile Responsive Styles */
 @media (max-width: 768px) {
     .analytics-container {
-        padding: 16px;
+        padding: 12px;
     }
     
     .analytics-section {
-        padding: 20px;
+        padding: 16px;
         margin-bottom: 20px;
     }
     
@@ -5106,6 +5162,11 @@ section {
         padding: 16px;
     }
     
+    .question-stat-card .question-text {
+        font-size: 0.95rem;
+        line-height: 1.4;
+    }
+    
     .answer-bar-container {
         flex-direction: column;
         align-items: flex-start;
@@ -5130,6 +5191,32 @@ section {
     
     .empty-state h2 {
         font-size: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .analytics-container {
+        padding: 8px;
+    }
+    
+    .analytics-section {
+        padding: 12px;
+    }
+    
+    .analytics-section h2 {
+        font-size: 1.25rem;
+    }
+    
+    .question-stat-card {
+        padding: 12px;
+    }
+    
+    .question-stat-card .question-text {
+        font-size: 0.9rem;
+    }
+    
+    .question-value {
+        font-size: 0.8rem;
     }
 }
 
@@ -6299,6 +6386,7 @@ section {
 body.score-page {
     padding: 0;
     background: #f8fafc;
+    overflow-x: hidden;
 }
 
 /* Main score page layout container */
@@ -6307,6 +6395,7 @@ body.score-page {
     margin: 0 auto;
     padding: 2rem;
     min-height: 100vh;
+    overflow-x: hidden;
 }
 
 /* Score page header */
