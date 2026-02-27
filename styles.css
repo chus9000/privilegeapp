@@ -904,6 +904,37 @@ input[type="radio"] {
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
 }
 
+/* Mobile responsive for create-own-banner */
+@media (max-width: 768px) {
+    .create-own-banner {
+        margin: 40px 1rem 32px;
+        padding: 32px 24px;
+    }
+    
+    .create-own-banner .banner-content h3 {
+        font-size: 24px;
+    }
+    
+    .create-own-banner .banner-content p {
+        font-size: 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .create-own-banner {
+        margin: 32px 0.75rem 24px;
+        padding: 24px 16px;
+    }
+    
+    .create-own-banner .banner-content h3 {
+        font-size: 20px;
+    }
+    
+    .create-own-banner .banner-content p {
+        font-size: 14px;
+    }
+}
+
 .footer {
     margin-top: auto;
     padding: 40px 20px 0px;
@@ -4853,6 +4884,7 @@ section {
     max-width: 900px;
     margin-left: auto;
     margin-right: auto;
+    overflow-x: hidden;
 }
 
 .analytics-section h2 {
@@ -4928,6 +4960,10 @@ section {
     padding: 20px;
     background: #f8fafc;
     border-radius: 12px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    width: 100%;
+    max-width: 100%;
 }
 
 .histogram-bar-container {
@@ -5133,6 +5169,8 @@ section {
     .analytics-section {
         padding: 16px;
         margin-bottom: 20px;
+        margin-left: 0;
+        margin-right: 0;
     }
     
     .analytics-section h2 {
@@ -5149,13 +5187,29 @@ section {
     }
     
     .histogram-chart {
-        overflow-x: auto;
         justify-content: flex-start;
-        padding: 16px;
+        padding: 12px;
+        min-height: 250px;
+        gap: 4px;
+        -webkit-overflow-scrolling: touch;
     }
     
     .histogram-bar-container {
-        min-width: 32px;
+        min-width: 24px;
+        flex-shrink: 0;
+    }
+    
+    .histogram-label {
+        font-size: 0.75rem;
+    }
+    
+    .bar-count {
+        font-size: 0.7rem;
+    }
+    
+    .user-indicator {
+        font-size: 0.7rem;
+        padding: 2px 6px;
     }
     
     .question-stat-card {
@@ -5201,10 +5255,30 @@ section {
     
     .analytics-section {
         padding: 12px;
+        margin-left: 0;
+        margin-right: 0;
     }
     
     .analytics-section h2 {
         font-size: 1.25rem;
+    }
+    
+    .histogram-chart {
+        padding: 8px;
+        gap: 3px;
+        min-height: 200px;
+    }
+    
+    .histogram-bar-container {
+        min-width: 20px;
+    }
+    
+    .histogram-label {
+        font-size: 0.7rem;
+    }
+    
+    .bar-count {
+        font-size: 0.65rem;
     }
     
     .question-stat-card {
@@ -6153,6 +6227,7 @@ section {
 .debrief-container {
     margin: 32px auto;
     max-width: 900px;
+    overflow-x: hidden;
 }
 
 /* Individual debrief section */
@@ -6163,6 +6238,7 @@ section {
     margin-bottom: 32px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
     border: 1px solid #e2e8f0;
+    overflow-x: hidden;
 }
 
 .debrief-section h2 {
@@ -6325,6 +6401,10 @@ section {
         font-size: 0.7rem;
         margin-bottom: 20px;
     }
+    
+    .debrief-section.response-analysis {
+        padding: 32px;
+    }
 
     .debrief-content h3 {
         font-size: 1.4rem;
@@ -6356,6 +6436,10 @@ section {
 @media (max-width: 480px) {
     .debrief-section {
         padding: 24px 20px;
+    }
+    
+    .debrief-section.response-analysis {
+        padding: 24px;
     }
 
     .debrief-section h2 {
